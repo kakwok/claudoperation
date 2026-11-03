@@ -1,0 +1,12 @@
+{
+  "name": "claudoperation",
+  "description": "Claudoperation: share the human side of human-AI work with your team",
+  "owner": { "name": "Martin" },
+  "plugins": [
+    {
+      "name": "claudoperation",
+      "source": "./plugins/claudoperation",
+      "description": "Capture skill, record format, validator, and an approval pane for Claude Code"
+    }
+  ]
+}

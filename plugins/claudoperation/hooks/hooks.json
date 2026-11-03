@@ -1,0 +1,4 @@
+{
+  "description": "Claudoperation approval pane",
+  "modules": ["./register.js"]
+}

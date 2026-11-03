@@ -1,0 +1,3 @@
+# Type declarations Claude Code writes when the mod loads
+plugins/claudoperation/.claude-plugin/types/
+plugins/claudoperation/tsconfig.json

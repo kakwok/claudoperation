@@ -1,0 +1,6 @@
+{
+  "name": "claudoperation",
+  "version": "0.1.0",
+  "description": "Capture what a human contributed in a Claude session as a short, approved record teammates read before the AI output",
+  "author": { "name": "Martin" }
+}
