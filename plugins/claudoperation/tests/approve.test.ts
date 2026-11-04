@@ -40,7 +40,7 @@ const PATH = 'sessions/ana/2026-11-04-demo.md'
 const PANE = {
   plugin: 'claudoperation',
   component: 'Pane',
-  requestId: 'claudo-approve',
+  requestId: 'clop-approve',
   viewport: { columns: 120, rows: 40 },
   props: {
     title: 'Approve record',
@@ -100,7 +100,7 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
   stubFiles(on, written)
 
   // No argument: the command finds the newest pending record itself
-  expect(await $.command.run({ command: 'claudo-approve', args: '' })).toEqual({})
+  expect(await $.command.run({ command: 'clop:approve', args: '' })).toEqual({})
   const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
 
   await ui.press({ key: 'h-H1' })
@@ -134,7 +134,7 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
 test('approve all needs a second press and never endorses AI decisions', async ($, on) => {
   const written = new Map<string, string>()
   stubFiles(on, written)
-  await $.command.run({ command: 'claudo-approve', args: PATH })
+  await $.command.run({ command: 'clop:approve', args: PATH })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
 
   await ui.press({ key: 'all' })

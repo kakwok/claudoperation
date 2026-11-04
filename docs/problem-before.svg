@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 510" width="600" height="510" role="img" aria-label="Three people each talk to a private AI chat. Their prompts stay hidden. The shared product is large and almost entirely unreviewed AI output with a few buried human lines, so teammates do not read it all and never see the human input.">
+<style>
+:root{--bg:#f5f7f9;--fg:#18222c;--muted:#5b6b79;--line:#aab6c1;--card:#ffffff;--human:#14735c;--human-bg:#dff1ea;--ai:#9a5b00;--ai-bg:#fbefd9;--warn:#b3361b}
+@media (prefers-color-scheme:dark){:root{--bg:#10171d;--fg:#e6edf3;--muted:#9aabb9;--line:#4a5a68;--card:#18222b;--human:#52c9a6;--human-bg:#12332b;--ai:#f0b24f;--ai-bg:#3a2b0e;--warn:#ff8a6b}}
+svg{color:var(--fg)}
+.panel{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.hdr{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:600;letter-spacing:.08em}
+text{font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;fill:currentColor}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px}
+.muted{fill:var(--muted)}
+.warn{fill:var(--warn);font-weight:500}
+.stroke{fill:none;stroke:currentColor;stroke-width:1.5}
+.dash{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:5 4}
+.arrow{fill:none;stroke:currentColor;stroke-width:1.5}
+.humanbox{fill:var(--human-bg);stroke:var(--human);stroke-width:1.5}
+.aibox{fill:var(--ai-bg);stroke:var(--ai);stroke-width:1.5;stroke-dasharray:4 3}
+.hum{fill:var(--human)}
+.aitx{fill:var(--ai)}
+.card{fill:var(--card);stroke:currentColor;stroke-width:1.5}
+.bar{fill:var(--line)}
+.pai{fill:var(--ai);opacity:.6}
+.phu{fill:var(--human)}
+.paiend{fill:var(--ai);opacity:.6;stroke:var(--human);stroke-width:2}
+.tool{fill:var(--fg)}
+.tooltx{fill:var(--bg);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;font-weight:500}
+.blabel{fill:var(--card);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:8px;font-weight:600}
+.swatch{stroke:none}
+.person{fill:var(--bg);stroke:currentColor;stroke-width:1.5}</style>
+<rect class="panel" x="10" y="10" width="580" height="490" rx="10"/>
+<text class="hdr" x="30" y="36" style="fill:var(--warn)">BEFORE</text><text x="570" y="36" text-anchor="end" class="muted">each person works alone with an AI</text>
+<g transform="translate(20,54)">
+        <defs><marker id="ar1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <circle class="person" cx="90" cy="34" r="16"/><text x="90" y="39" text-anchor="middle">A</text>
+        <circle class="person" cx="280" cy="34" r="16"/><text x="280" y="39" text-anchor="middle">B</text>
+        <circle class="person" cx="470" cy="34" r="16"/><text x="470" y="39" text-anchor="middle">C</text>
+        <rect class="dash" x="10" y="70" width="160" height="104" rx="6"/><rect class="dash" x="200" y="70" width="160" height="104" rx="6"/><rect class="dash" x="390" y="70" width="160" height="104" rx="6"/>
+        <g class="mono muted"><text x="20" y="90">PRIVATE AI CHAT</text><text x="210" y="90">PRIVATE AI CHAT</text><text x="400" y="90">PRIVATE AI CHAT</text></g>
+        <g class="muted" font-style="italic">
+          <text x="20" y="114">“drop section 3”</text><text x="20" y="134">“use the 2019 data”</text><text x="20" y="154">“no, that’s wrong”</text>
+          <text x="210" y="114">“narrow the scope”</text><text x="210" y="134">“try option 2”</text><text x="210" y="154">“redo the proof”</text>
+          <text x="400" y="114">“cite our pilot”</text><text x="400" y="134">“too long, cut it”</text><text x="400" y="154">“looks fine, ship”</text>
+        </g>
+        <line class="arrow" x1="90" y1="50" x2="90" y2="68"/><line class="arrow" x1="280" y1="50" x2="280" y2="68"/><line class="arrow" x1="470" y1="50" x2="470" y2="68"/>
+        <line class="arrow" x1="90" y1="174" x2="90" y2="252" marker-end="url(#ar1)"/>
+        <line class="arrow" x1="280" y1="174" x2="280" y2="252" marker-end="url(#ar1)"/>
+        <line class="arrow" x1="470" y1="174" x2="470" y2="252" marker-end="url(#ar1)"/>
+        <text x="98" y="218" class="muted">output only</text>
+        <rect class="card" x="10" y="254" width="540" height="92" rx="6"/>
+        <text x="24" y="273" class="mono muted">SHARED PRODUCT · 40 PAGES, MOSTLY AI OUTPUT</text>
+        <rect class="pai" x="24" y="284" width="500" height="10" rx="3"/>
+        <rect class="pai" x="24" y="298" width="200" height="10" rx="3"/><rect class="phu" x="228" y="298" width="50" height="10" rx="3"/><rect class="pai" x="282" y="298" width="242" height="10" rx="3"/>
+        <rect class="pai" x="24" y="312" width="500" height="10" rx="3"/>
+        <rect class="pai" x="24" y="326" width="360" height="10" rx="3"/><rect class="phu" x="388" y="326" width="36" height="10" rx="3"/><rect class="pai" x="428" y="326" width="96" height="10" rx="3"/>
+        <rect class="phu swatch" x="10" y="360" width="16" height="10" rx="2"/><text x="32" y="369">human input, a few lines</text>
+        <rect class="pai swatch" x="226" y="360" width="16" height="10" rx="2"/><text x="248" y="369">AI output, nobody has reviewed it</text>
+        <g class="warn">
+          <text x="10" y="396">Too long to read in full</text>
+          <text x="196" y="396">Human input is buried</text>
+          <text x="388" y="396">What mattered? Unknown</text>
+        </g>
+        <text x="10" y="420" class="muted">Teammates skim the product, and the human contribution goes unseen.</text>
+      </g>
+</svg>

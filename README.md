@@ -2,6 +2,28 @@
 
 When AI writes most of the output, teammates can no longer see what each human actually contributed. Claudoperation fixes that with a **session record**: a short Markdown file, drafted by Claude and approved by you, that says what you decided, corrected and originated in a session with Claude, and which AI decisions nobody has reviewed. Teammates read it before the AI output.
 
+## The problem
+
+AI now writes most of the product, and nobody reads all of it. Teammates value human input most, but it stays in private chats.
+
+<p align="center">
+  <img src="docs/problem-before.svg" width="600" alt="Before: three people each work with a private AI chat. The shared product is large and mostly unreviewed AI output, with a few buried human lines.">
+</p>
+
+Claudoperation turns each session into a short record the author approves. Teammates, and their AIs, read the records before the product.
+
+<p align="center">
+  <img src="docs/problem-after.svg" width="600" alt="After: the capture skill drafts a record from each chat, the author approves it, the synthesize skill merges the records into a net story, and the product's text is tagged to its human author or marked as unreviewed AI.">
+</p>
+
+## What you approve
+
+`/clop:approve` opens the capture record in a pane (an example record is shown). You tick the claims that are accurate, fix labels, add evidence where a label needs it, and endorse the AI decisions you checked.
+
+<p align="center">
+  <img src="docs/approve-pane.svg" width="760" alt="The /clop:approve pane showing an example record with approve checkboxes, label dropdowns, an evidence prompt, endorse checkboxes for AI decisions, and Save, Approve all and Cancel buttons.">
+</p>
+
 ## What's in the plugin
 
 | Part | What it does | Where it runs |
@@ -9,12 +31,12 @@ When AI writes most of the output, teammates can no longer see what each human a
 | `/claudoperation:capture` | Drafts a record of the session since the last capture, ranks your key contributions, and runs the validator | Claude Code; skills also load on claude.ai |
 | `SPEC.md` | The record format, v0.1 | Inside the skill folder |
 | `scripts/validate.mjs` | Checks a record against the spec (needs Node.js) | Anywhere |
-| `/claudo-approve` | A pane to tick claims, change labels, add evidence, and endorse AI decisions, then save | Claude Code terminal, Desktop app, VS Code (v2.1.287+) |
+| `/clop:approve` | A pane to tick claims, change labels, add evidence, and endorse AI decisions, then save | Claude Code terminal, Desktop app, VS Code (v2.1.287+) |
 
 ## Install
 
 ```bash
-claude plugin marketplace add <owner>/claudoperation
+claude plugin marketplace add kakwok/claudoperation
 claude plugin install claudoperation@claudoperation
 ```
 
@@ -28,7 +50,7 @@ claude --plugin-dir ./plugins/claudoperation
 
 1. Work with Claude as usual.
 2. Run `/claudoperation:capture`. Claude writes `sessions/<you>/<date>-<slug>.md`.
-3. Run `/claudo-approve` (it opens the newest pending record), tick what's right, fix labels, save.
+3. Run `/clop:approve` (it opens the newest pending record), tick what's right, fix labels, save.
 4. Commit the record with your product changes.
 
 Without the pane, edit the checkboxes in the file directly, or reply "ok" with any corrections.

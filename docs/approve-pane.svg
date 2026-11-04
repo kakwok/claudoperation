@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 500" width="960" height="500" role="img" aria-label="The /clop:approve pane in Claude Code showing an example capture record. Each human claim has a checkbox and a label dropdown. A claim relabeled to Verification asks for evidence. AI decisions have endorse checkboxes. Buttons: Save, Approve all, Cancel.">
+<style>
+:root{--fg:#18222c;--muted:#5b6b79;--line:#aab6c1}
+@media (prefers-color-scheme:dark){:root{--fg:#e6edf3;--muted:#9aabb9;--line:#4a5a68}}
+.m{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;fill:#e6edf3}
+.b{font-weight:700} .d{fill:#8b949e} .g{fill:#3fb950} .r{fill:#ff7b72} .t{fill:#e6edf3}
+.term{fill:#0d1117;stroke:#30363d;stroke-width:1.5}
+.bar{fill:#161b22}
+.sel{fill:#21262d;stroke:#3d444d} .sel.hot{stroke:#d29922}
+.inp{fill:#0d1117;stroke:#d29922}
+.btn{fill:#21262d;stroke:#3d444d}
+.c{font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:13px;font-weight:600;fill:var(--fg)} .cm{font-weight:400;font-size:12px;fill:var(--muted)}
+.lead{fill:none;stroke:var(--muted);stroke-width:1.2} .dot{fill:var(--muted)}
+</style>
+<rect class="term" x="10" y="10" width="612" height="480" rx="8"/>
+<path d="M10 18a8 8 0 0 1 8-8h596a8 8 0 0 1 8 8v22H10z" class="bar"/>
+<circle cx="28" cy="25" r="5" fill="#ff5f57"/><circle cx="46" cy="25" r="5" fill="#febc2e"/><circle cx="64" cy="25" r="5" fill="#28c840"/>
+<text x="316" y="29" text-anchor="middle" class="m d">Approve record · /clop:approve</text>
+<text x="28.0" y="70" class="m b" xml:space="preserve">2026-11-02-taxonomy-workflow · endorsed</text>
+<text x="28.0" y="90" class="m d" xml:space="preserve">Martin made cooperation the main goal and credit a side effect. He pushed</text>
+<text x="28.0" y="106" class="m d" xml:space="preserve">back on related-work claims and asked that unreviewed AI decisions be visible.</text>
+<text x="28.0" y="138" class="m b" xml:space="preserve">What martin did  (★ key)</text>
+<text x="28.0" y="162" class="m t" xml:space="preserve">[x] ★ H1  </text>
+<rect class="sel" x="100" y="150" width="124" height="17" rx="3"/>
+<text x="106" y="162" class="m">🎯 Direction ▾</text>
+<text x="28.0" y="180" class="m " xml:space="preserve">    The main goal is cooperation; credit is a side effect of label analytics.</text>
+<text x="28.0" y="204" class="m t" xml:space="preserve">[x] ★ H4  </text>
+<rect class="sel" x="100" y="192" width="136" height="17" rx="3"/><text x="106" y="204" class="m">💡 Origination ▾</text>
+<text x="28.0" y="222" class="m " xml:space="preserve">    Nobody knows which AI decisions a human never reviewed; make them visible.</text>
+<text x="28.0" y="246" class="m t" xml:space="preserve">[ ]   H6  </text>
+<rect class="sel hot" x="100" y="234" width="136" height="17" rx="3"/><text x="106" y="246" class="m">✅ Verification ▾</text>
+<text x="28.0" y="264" class="m d" xml:space="preserve">    Ran the validator on all three records.</text>
+<text x="28.0" y="284" class="m d" xml:space="preserve">    checked </text>
+<rect class="inp" x="124" y="272" width="330" height="17" rx="3"/><text x="130" y="284" class="m d">what you checked, and how</text>
+<text x="470" y="284" class="m g">[set]</text>
+<text x="28.0" y="320" class="m b" xml:space="preserve">AI decisions</text>
+<text x="28.0" y="340" class="m t" xml:space="preserve">[x] All AI claims are recorded accurately</text>
+<text x="28.0" y="358" class="m t" xml:space="preserve">[ ] endorse A1 Seven-label taxonomy, one label per claim</text>
+<text x="28.0" y="376" class="m t" xml:space="preserve">[x] endorse A3 AI claims are endorsed or recorded, not reviewed</text>
+<text x="28.0" y="394" class="m t" xml:space="preserve">[ ] endorse A7 </text>
+<text x="136.0" y="394" class="m t" xml:space="preserve">synthesize nudges after about 5 captures — never discussed</text>
+<text x="28.0" y="424" class="m r" xml:space="preserve">Add evidence first: H6 (checked:)</text>
+<rect class="btn" x="22" y="440" width="78" height="22" rx="4"/><text x="28" y="455" class="m">Save (s)</text>
+<rect class="btn" x="112" y="440" width="134" height="22" rx="4"/><text x="118" y="455" class="m">Approve all (a)</text>
+<rect class="btn" x="258" y="440" width="92" height="22" rx="4"/><text x="264" y="455" class="m">Cancel (c)</text>
+<path class="lead" d="M622 158 L650 158 L650 150 L660 150"/><circle class="dot" cx="622" cy="158" r="3"/>
+<text x="668" y="148" class="c">Tick to approve</text><text x="668" y="164" class="c cm">Each human claim, one at a time.</text>
+<path class="lead" d="M622 200 L650 200 L650 200 L660 200"/><circle class="dot" cx="622" cy="200" r="3"/>
+<text x="668" y="198" class="c">Fix the label</text><text x="668" y="214" class="c cm">Pre-filled by Claude, relabels are recorded.</text>
+<path class="lead" d="M622 280 L650 280 L650 262 L660 262"/><circle class="dot" cx="622" cy="280" r="3"/>
+<text x="668" y="260" class="c">Evidence required</text><text x="668" y="276" class="c cm">Verification needs what you checked.</text>
+<path class="lead" d="M622 376 L650 376 L650 376 L660 376"/><circle class="dot" cx="622" cy="376" r="3"/>
+<text x="668" y="374" class="c">Endorse AI decisions</text><text x="668" y="390" class="c cm">Unticked means recorded, not reviewed.</text>
+<path class="lead" d="M622 451 L650 451 L650 451 L660 451"/><circle class="dot" cx="622" cy="451" r="3"/>
+<text x="668" y="449" class="c">Save or Approve all</text><text x="668" y="465" class="c cm">Approve all asks first and is recorded.</text>
+</svg>

@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 550" width="600" height="550" role="img" aria-label="Each person's AI chat has the capture skill attached, which drafts a short record the author approves. The synthesize skill merges the records into a net story. Teammates and their AIs read the net story first, and the product's text is accounted for: human parts are tagged with their author, AI parts are marked reviewed or not.">
+<style>
+:root{--bg:#f5f7f9;--fg:#18222c;--muted:#5b6b79;--line:#aab6c1;--card:#ffffff;--human:#14735c;--human-bg:#dff1ea;--ai:#9a5b00;--ai-bg:#fbefd9;--warn:#b3361b}
+@media (prefers-color-scheme:dark){:root{--bg:#10171d;--fg:#e6edf3;--muted:#9aabb9;--line:#4a5a68;--card:#18222b;--human:#52c9a6;--human-bg:#12332b;--ai:#f0b24f;--ai-bg:#3a2b0e;--warn:#ff8a6b}}
+svg{color:var(--fg)}
+.panel{fill:var(--bg);stroke:var(--line);stroke-width:1.5}
+.hdr{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:600;letter-spacing:.08em}
+text{font-family:system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:12px;fill:currentColor}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px}
+.muted{fill:var(--muted)}
+.warn{fill:var(--warn);font-weight:500}
+.stroke{fill:none;stroke:currentColor;stroke-width:1.5}
+.dash{fill:none;stroke:var(--line);stroke-width:1.5;stroke-dasharray:5 4}
+.arrow{fill:none;stroke:currentColor;stroke-width:1.5}
+.humanbox{fill:var(--human-bg);stroke:var(--human);stroke-width:1.5}
+.aibox{fill:var(--ai-bg);stroke:var(--ai);stroke-width:1.5;stroke-dasharray:4 3}
+.hum{fill:var(--human)}
+.aitx{fill:var(--ai)}
+.card{fill:var(--card);stroke:currentColor;stroke-width:1.5}
+.bar{fill:var(--line)}
+.pai{fill:var(--ai);opacity:.6}
+.phu{fill:var(--human)}
+.paiend{fill:var(--ai);opacity:.6;stroke:var(--human);stroke-width:2}
+.tool{fill:var(--fg)}
+.tooltx{fill:var(--bg);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;font-weight:500}
+.blabel{fill:var(--card);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:8px;font-weight:600}
+.swatch{stroke:none}
+.person{fill:var(--bg);stroke:currentColor;stroke-width:1.5}</style>
+<rect class="panel" x="10" y="10" width="580" height="530" rx="10"/>
+<text class="hdr" x="30" y="36" style="fill:var(--human)">AFTER</text><text x="570" y="36" text-anchor="end" class="muted">each session leaves an approved record</text>
+<g transform="translate(20,54)">
+        <defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+        <circle class="person" cx="90" cy="34" r="16"/><text x="90" y="39" text-anchor="middle">A</text>
+        <circle class="person" cx="280" cy="34" r="16"/><text x="280" y="39" text-anchor="middle">B</text>
+        <circle class="person" cx="470" cy="34" r="16"/><text x="470" y="39" text-anchor="middle">C</text>
+        <rect class="dash" x="10" y="66" width="160" height="34" rx="6"/><rect class="dash" x="200" y="66" width="160" height="34" rx="6"/><rect class="dash" x="390" y="66" width="160" height="34" rx="6"/>
+        <g class="mono muted"><text x="20" y="87">AI CHAT</text><text x="210" y="87">AI CHAT</text><text x="400" y="87">AI CHAT</text></g>
+        <line class="arrow" x1="90" y1="50" x2="90" y2="64"/><line class="arrow" x1="280" y1="50" x2="280" y2="64"/><line class="arrow" x1="470" y1="50" x2="470" y2="64"/>
+        <!-- capture skill attached to each chat -->
+        <rect class="tool" x="96" y="90" width="68" height="20" rx="10"/><text class="tooltx" x="130" y="104" text-anchor="middle">/capture</text>
+        <rect class="tool" x="286" y="90" width="68" height="20" rx="10"/><text class="tooltx" x="320" y="104" text-anchor="middle">/capture</text>
+        <rect class="tool" x="476" y="90" width="68" height="20" rx="10"/><text class="tooltx" x="510" y="104" text-anchor="middle">/capture</text>
+        <line class="arrow" x1="50" y1="100" x2="50" y2="132" marker-end="url(#ar2)"/>
+        <line class="arrow" x1="240" y1="100" x2="240" y2="132" marker-end="url(#ar2)"/>
+        <line class="arrow" x1="430" y1="100" x2="430" y2="132" marker-end="url(#ar2)"/>
+        <text x="58" y="124" class="muted">author approves, ~2 min</text>
+        <g transform="translate(0,12)">
+          <rect class="card" x="10" y="122" width="160" height="118" rx="6"/><rect class="card" x="200" y="122" width="160" height="118" rx="6"/><rect class="card" x="390" y="122" width="160" height="118" rx="6"/>
+          <g class="mono muted"><text x="20" y="140">RECORD A</text><text x="210" y="140">RECORD B</text><text x="400" y="140">RECORD C</text></g>
+          <rect class="humanbox" x="18" y="148" width="144" height="26" rx="4"/><text x="26" y="165" class="hum">✓ Direction</text><text x="96" y="165">drop §3</text>
+          <rect class="humanbox" x="18" y="180" width="144" height="26" rx="4"/><text x="26" y="197" class="hum">✓ Correction</text><text x="104" y="197">2019 data</text>
+          <rect class="aibox" x="18" y="212" width="144" height="22" rx="4"/><text x="26" y="227" class="aitx">AI: layout · unreviewed</text>
+          <rect class="humanbox" x="208" y="148" width="144" height="26" rx="4"/><text x="216" y="165" class="hum">✓ Origination</text><text x="298" y="165">new proof</text>
+          <rect class="humanbox" x="208" y="180" width="144" height="26" rx="4"/><text x="216" y="197" class="hum">✓ Choice</text><text x="284" y="197">option 2</text>
+          <rect class="aibox" x="208" y="212" width="144" height="22" rx="4"/><text x="216" y="227" class="aitx">AI: wording · unreviewed</text>
+          <rect class="humanbox" x="398" y="148" width="144" height="26" rx="4"/><text x="406" y="165" class="hum">✓ Knowledge</text><text x="486" y="165">pilot data</text>
+          <rect class="humanbox" x="398" y="180" width="144" height="26" rx="4"/><text x="406" y="197" class="hum">✓ Verification</text><text x="496" y="197">ran tests</text>
+          <rect class="aibox" x="398" y="212" width="144" height="22" rx="4"/><text x="406" y="227" class="aitx">AI: cut text · unreviewed</text>
+        </g>
+        <!-- merge into net story -->
+        <polyline class="arrow" points="90,264 90,276 470,276 470,264" />
+        <line class="arrow" x1="280" y1="264" x2="280" y2="290" marker-end="url(#ar2)"/>
+        <rect class="card" x="150" y="292" width="260" height="42" rx="6"/>
+        <text x="162" y="310" class="mono muted">NET STORY</text>
+        <text x="162" y="326">A to C, replaced steps dropped</text>
+        <rect class="tool" x="338" y="284" width="82" height="20" rx="10"/><text class="tooltx" x="379" y="298" text-anchor="middle">/synthesize</text>
+        <!-- readers: teammates and AI -->
+        <line class="arrow" x1="280" y1="334" x2="280" y2="362" marker-end="url(#ar2)"/>
+        <text x="290" y="352" class="muted">teammates and their AIs read this first</text>
+        <rect class="card" x="10" y="364" width="540" height="62" rx="6"/>
+        <text x="24" y="382" class="mono muted">SHARED PRODUCT · BUILT WITH THE HUMAN DIRECTION IN VIEW</text>
+        <rect class="paiend" x="24" y="391" width="226" height="10" rx="3"/><rect class="phu" x="254" y="391" width="76" height="10" rx="3"/><rect class="pai" x="334" y="391" width="190" height="10" rx="3"/>
+        <rect class="pai" x="24" y="405" width="136" height="10" rx="3"/><rect class="phu" x="164" y="405" width="76" height="10" rx="3"/><rect class="pai" x="244" y="405" width="156" height="10" rx="3"/><rect class="phu" x="404" y="405" width="66" height="10" rx="3"/><rect class="paiend" x="474" y="405" width="50" height="10" rx="3"/>
+        <text class="blabel" x="292" y="399" text-anchor="middle">A</text><text class="blabel" x="202" y="413" text-anchor="middle">B</text><text class="blabel" x="437" y="413" text-anchor="middle">C</text>
+        <rect class="phu swatch" x="10" y="440" width="16" height="10" rx="2"/><text x="32" y="449">human, tagged A, B, C</text>
+        <rect class="pai swatch" x="196" y="440" width="16" height="10" rx="2"/><text x="218" y="449">AI, unreviewed</text>
+        <rect class="paiend" x="340" y="440" width="16" height="10" rx="2"/><text x="362" y="449">AI, a human checked it</text>
+      </g>
+</svg>

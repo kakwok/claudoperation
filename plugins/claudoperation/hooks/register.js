@@ -1,9 +1,9 @@
-// Claudoperation approval pane: /claudo-approve [record path]
+// Claudoperation approval pane: /clop:approve [record path]
 // Opens a pane over a session record. The author ticks claims, changes labels,
 // endorses AI decisions, and saves. The record file stays the source of truth.
 import { parseRecord, applyApproval, validateRecord, LABELS, EVIDENCE } from './record.js'
 
-const PANE = 'claudo-approve'
+const PANE = 'clop-approve'
 const LABEL_OPTIONS = Object.keys(LABELS).map((l) => ({ value: l, label: LABELS[l] + ' ' + l }))
 
 // The record being reviewed and the author's unsaved choices
@@ -55,7 +55,7 @@ async function save($) {
   // Refuse to overwrite edits made on disk since the pane opened
   const onDisk = await $.fs.read(rec.path)
   if (onDisk !== rec.source) {
-    draft.error = 'The file changed on disk. Close and run /claudo-approve again.'
+    draft.error = 'The file changed on disk. Close and run /clop:approve again.'
     return false
   }
   const changes = { human: {}, ai: {}, accuracy: draft.accuracy, notes: [], approval: draft.bulk ? 'bulk' : 'individual' }
@@ -81,16 +81,16 @@ async function save($) {
 export function register(on) {
   on('session.start', async ($, e, next) => {
     await $.command.register({
-      name: 'claudo-approve',
+      name: 'clop:approve',
       description: 'Approve a Claudoperation session record in a pane',
       argumentHint: '[record path]',
     })
     return next(e)
   })
 
-  on('command.run', { command: 'claudo-approve' }, async ($, e) => {
+  on('command.run', { command: 'clop:approve' }, async ($, e) => {
     const path = (e.args || '').trim() || (await findPending($))
-    if (!path) return { text: 'No pending record under sessions/. Pass a path: /claudo-approve <record.md>' }
+    if (!path) return { text: 'No pending record under sessions/. Pass a path: /clop:approve <record.md>' }
     if (!(await $.fs.exists(path))) return { text: 'No such file: ' + path }
     startDraft(path, await $.fs.read(path))
     if (!rec.parsed.human.length) return { text: 'No claims found in ' + path }
@@ -101,7 +101,7 @@ export function register(on) {
   on('ui.render', { component: 'Pane' }, async ($, e, next) => {
     if (e.requestId !== PANE) return next(e)
     const { Box, Text, Button, Select, Input } = $.ui.resolve(e)
-    if (!rec) return Text({ children: ['No record open. Run /claudo-approve.'] })
+    if (!rec) return Text({ children: ['No record open. Run /clop:approve.'] })
     const r = rec.parsed
     const redraw = () => $.ui.invalidate('ui.render')
     const endorsed = r.frontmatter.product_type !== 'functional'
