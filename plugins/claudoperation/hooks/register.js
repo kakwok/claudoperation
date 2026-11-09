@@ -1,9 +1,9 @@
-// Claudoperation approval pane: /clop:approve [record path]
+// Claudoperation approval pane: /claudoperation-approve [record path]
 // Opens a pane over a session record. The author ticks claims, changes labels,
 // endorses AI decisions, and saves. The record file stays the source of truth.
 import { parseRecord, applyApproval, validateRecord, LABELS, EVIDENCE } from './record.js'
 
-const PANE = 'clop-approve'
+const PANE = 'claudoperation-approve'
 const LABEL_OPTIONS = Object.keys(LABELS).map((l) => ({ value: l, label: LABELS[l] + ' ' + l }))
 
 // The record being reviewed and the author's unsaved choices
@@ -30,7 +30,7 @@ async function findPending($) {
   }
   found.sort().reverse()
   for (const path of found) {
-    if (/^approval: pending$/m.test(await $.fs.read(path))) return path
+    if (parseRecord(await $.fs.read(path)).frontmatter.approval === "pending") return path
   }
   return null
 }
@@ -55,7 +55,7 @@ async function save($) {
   // Refuse to overwrite edits made on disk since the pane opened
   const onDisk = await $.fs.read(rec.path)
   if (onDisk !== rec.source) {
-    draft.error = 'The file changed on disk. Close and run /clop:approve again.'
+    draft.error = 'The file changed on disk. Close and run /claudoperation-approve again.'
     return false
   }
   const changes = { human: {}, ai: {}, accuracy: draft.accuracy, notes: [], approval: draft.bulk ? 'bulk' : 'individual' }
@@ -81,16 +81,16 @@ async function save($) {
 export function register(on) {
   on('session.start', async ($, e, next) => {
     await $.command.register({
-      name: 'clop:approve',
+      name: 'claudoperation-approve',
       description: 'Approve a Claudoperation session record in a pane',
       argumentHint: '[record path]',
     })
     return next(e)
   })
 
-  on('command.run', { command: 'clop:approve' }, async ($, e) => {
+  on('command.run', { command: 'claudoperation-approve' }, async ($, e) => {
     const path = (e.args || '').trim() || (await findPending($))
-    if (!path) return { text: 'No pending record under sessions/. Pass a path: /clop:approve <record.md>' }
+    if (!path) return { text: 'No pending record under sessions/. Pass a path: /claudoperation-approve <record.md>' }
     if (!(await $.fs.exists(path))) return { text: 'No such file: ' + path }
     startDraft(path, await $.fs.read(path))
     if (!rec.parsed.human.length) return { text: 'No claims found in ' + path }
@@ -101,7 +101,7 @@ export function register(on) {
   on('ui.render', { component: 'Pane' }, async ($, e, next) => {
     if (e.requestId !== PANE) return next(e)
     const { Box, Text, Button, Select, Input } = $.ui.resolve(e)
-    if (!rec) return Text({ children: ['No record open. Run /clop:approve.'] })
+    if (!rec) return Text({ children: ['No record open. Run /claudoperation-approve.'] })
     const r = rec.parsed
     const redraw = () => $.ui.invalidate('ui.render')
     const endorsed = r.frontmatter.product_type !== 'functional'
@@ -127,12 +127,14 @@ export function register(on) {
               ...(i === 0 ? { autoFocus: true } : {}),
               onPress: () => { d.checked = !d.checked; draft.error = null; redraw() },
             }),
-            Select({
-              key: 'l-' + c.id,
-              options: LABEL_OPTIONS,
-              value: d.label,
-              onSelect: (value) => { d.label = value; draft.error = null; redraw() },
-            }),
+            draft.editLabels
+              ? Select({
+                  key: 'l-' + c.id,
+                  options: LABEL_OPTIONS,
+                  value: d.label,
+                  onSelect: (value) => { d.label = value; draft.error = null; redraw() },
+                })
+              : Text({ key: 'l-' + c.id, children: [LABELS[d.label] + ' ' + d.label] }),
           ],
         }),
       )
@@ -199,6 +201,13 @@ export function register(on) {
                 await $.ui.close({ id: PANE })
               } else redraw()
             },
+          }),
+          Button({
+            key: 'labels',
+            label: draft.editLabels ? 'Done with labels' : 'Edit labels',
+            hotkey: 'l',
+            plain: true,
+            onPress: () => { draft.editLabels = !draft.editLabels; redraw() },
           }),
           Button({
             key: 'all',

@@ -1,37 +1,50 @@
 import { expect, test } from 'claude-code/testing'
 import { validateRecord, applyApproval, parseRecord } from '../hooks/record.js'
 
-const RECORD = `---
-claudoperation: 0.1
-session: 2026-11-04-demo
-member: ana
-product: proposal/main.tex
-product_type: endorsed
-span: 2026-11-04
-approval: pending
----
+const RECORD = `# Ana: Detector layout
 
-**Summary.** Ana chose the detector layout and fixed a wrong trigger rate.
+Ana chose the detector layout and fixed a wrong trigger rate.
 
-## What ana did — key
-- [ ] H1 · 🔀 Choice · Picked layout B over A. *Why key: sets the geometry.*
-- [ ] H2 · 🛠️ Correction · The trigger rate is 100 kHz, not 1 MHz. → corrects: AI assumed 1 MHz. *Why key: changes the budget.*
+## What Ana did
+
+| Approve | Claim |
+| :-- | --- |
+| ☐ H1<br>🔀 Choice | Picked layout B over A.<br>**Why key:** sets the geometry. |
+| ☐ H2<br>🛠️ Correction | The trigger rate is 100 kHz, not 1 MHz.<br>**Why key:** changes the budget.<br>corrects: AI assumed 1 MHz |
 
 <details><summary>Also (1 more)</summary>
 
-- [ ] H3 · 📚 Knowledge · The 2024 test beam used 120 GeV pions.
+| Approve | Claim |
+| :-- | --- |
+| ☐ H3<br>📚 Knowledge | The 2024 test beam used 120 GeV pions. |
+
 </details>
 
 ## AI decisions
-- [ ] All AI claims below are recorded accurately
 
-Tick to endorse:
-- [ ] A1 · Use a two-column table for the budget
-- [ ] A2 · Section order follows the call text — never discussed
+☐ All AI claims below are recorded accurately
+
+| Endorse | AI decision |
+| :-- | --- |
+| ☐ A1 | Use a two-column table for the budget |
+| ☐ A2 | Section order follows the call text<br>Never discussed |
 
 <details><summary>Links and evidence</summary>
 
 - H2 → main.tex §Budget
+</details>
+
+<details><summary>Record details</summary>
+
+| Field | Value |
+| --- | --- |
+| claudoperation | 0.2 |
+| session | 2026-11-04-demo |
+| member | ana |
+| product | proposal/main.tex |
+| product_type | endorsed |
+| span | 2026-11-04 |
+| approval | pending |
 </details>
 `
 
@@ -40,7 +53,7 @@ const PATH = 'sessions/ana/2026-11-04-demo.md'
 const PANE = {
   plugin: 'claudoperation',
   component: 'Pane',
-  requestId: 'clop-approve',
+  requestId: 'claudoperation-approve',
   viewport: { columns: 120, rows: 40 },
   props: {
     title: 'Approve record',
@@ -81,8 +94,8 @@ test('the parser reads claims, key marks, relations and AI notes', async () => {
 
 test('the validator catches a Correction without evidence and a fourth key claim', async () => {
   const bad = RECORD
-    .replace(' → corrects: AI assumed 1 MHz.', '')
-    .replace('- [ ] H2 ·', '- [ ] H4 · 🔀 Choice · Extra. *Why key: x.*\n- [ ] H5 · 🔀 Choice · Extra. *Why key: x.*\n- [ ] H2 ·')
+    .replace('<br>corrects: AI assumed 1 MHz', '')
+    .replace('| ☐ H2<br>', '| ☐ H4<br>🔀 Choice | Extra.<br>**Why key:** x. |\n| ☐ H5<br>🔀 Choice | Extra.<br>**Why key:** x. |\n| ☐ H2<br>')
   const { errors } = validateRecord(bad)
   expect(errors).toContain('H2: Correction needs a "corrects:" relation')
   expect(errors).toContain('key: 4 key claims, at most 3')
@@ -90,9 +103,9 @@ test('the validator catches a Correction without evidence and a fourth key claim
 
 test('applyApproval adds the author note inside the links block', async () => {
   const out = applyApproval(RECORD, { human: { H1: { checked: true } }, notes: ['H1 checked by hand'], approval: 'individual' })
-  expect(out).toContain('- [x] H1 · 🔀 Choice')
+  expect(out).toContain('| ☑ H1<br>🔀 Choice')
   expect(out).toContain('- H2 → main.tex §Budget\n- author: H1 checked by hand\n</details>')
-  expect(out).toContain('approval: individual')
+  expect(out).toContain('| approval | individual |')
 })
 
 test('the pane approves, relabels with evidence, endorses, and saves', async ($, on) => {
@@ -100,7 +113,7 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
   stubFiles(on, written)
 
   // No argument: the command finds the newest pending record itself
-  expect(await $.command.run({ command: 'clop:approve', args: '' })).toEqual({})
+  expect(await $.command.run({ command: 'claudoperation-approve', args: '' })).toEqual({})
   const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
 
   await ui.press({ key: 'h-H1' })
@@ -120,13 +133,13 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
   await ui.press({ key: 'save' })
 
   const out = written.get(PATH)
-  expect(out).toContain('- [x] H1 · 🔀 Choice')
-  expect(out).toContain('- [x] H2 · 🛠️ Correction')
-  expect(out).toContain('- [ ] H3 · ✅ Verification · The 2024 test beam used 120 GeV pions. → checked: compared with the 2024 run log')
-  expect(out).toContain('- [x] All AI claims below are recorded accurately')
-  expect(out).toContain('- [x] A1 · Use a two-column table')
-  expect(out).toContain('- [ ] A2 · Section order')
-  expect(out).toContain('approval: individual')
+  expect(out).toContain('| ☑ H1<br>🔀 Choice')
+  expect(out).toContain('| ☑ H2<br>🛠️ Correction')
+  expect(out).toContain('| ☐ H3<br>✅ Verification | The 2024 test beam used 120 GeV pions.<br>checked: compared with the 2024 run log |')
+  expect(out).toContain('☑ All AI claims below are recorded accurately')
+  expect(out).toContain('| ☑ A1 | Use a two-column table')
+  expect(out).toContain('| ☐ A2 | Section order')
+  expect(out).toContain('| approval | individual |')
   expect(out).toContain('- author: H3 relabeled Knowledge → Verification')
   expect(validateRecord(out).errors).toEqual([])
 })
@@ -134,7 +147,7 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
 test('approve all needs a second press and never endorses AI decisions', async ($, on) => {
   const written = new Map<string, string>()
   stubFiles(on, written)
-  await $.command.run({ command: 'clop:approve', args: PATH })
+  await $.command.run({ command: 'claudoperation-approve', args: PATH })
   const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
 
   await ui.press({ key: 'all' })
@@ -143,8 +156,8 @@ test('approve all needs a second press and never endorses AI decisions', async (
   await ui.press({ key: 'save' })
 
   const out = written.get(PATH)
-  expect(out).toContain('approval: bulk')
-  expect(out).toContain('- [x] H3 · 📚 Knowledge')
-  expect(out).toContain('- [x] All AI claims below are recorded accurately')
-  expect(out).toContain('- [ ] A1 · Use a two-column table')
+  expect(out).toContain('| approval | bulk |')
+  expect(out).toContain('| ☑ H3<br>📚 Knowledge')
+  expect(out).toContain('☑ All AI claims below are recorded accurately')
+  expect(out).toContain('| ☐ A1 | Use a two-column table')
 })

@@ -36,32 +36,23 @@ If `node` is unavailable, count from the records and say the counts were manual.
 
 ## 4. Write the file
 
-Path: `sessions/<member>/net/<YYYY-MM-DD>-net.md`. Frontmatter:
-
-```
----
-claudoperation: 0.1
-kind: net-story
-member: <member>
-covers: <first-session-id> → <last-session-id>
-release: false
-approval: pending
----
-```
+Path: `sessions/<member>/net/<YYYY-MM-DD>-net.md`. It reads like a short page, not like data: no frontmatter, no IDs or metadata before the story. Same rule as records (`../capture/SPEC.md` §1 to §3).
 
 Body, in this order (the reader's order):
 
-1. `## What <member> contributed`: approved human claims that survive, with labels, ranked, with `<session>#<ID>` refs.
-2. `## Net story`: the narrative from step 3.
-3. `## Open questions`: from records, plus unapproved records.
-4. `## AI decisions not yet reviewed`: unticked AI claims with refs; mark never discussed / delegated.
-5. `<details><summary>Metadata</summary>`: stats output as a table (sessions, labels, human:AI ratio, superseded, bulk approvals, relabels, overrides).
+1. `# <Member>: net story to <last-session-date>`, then a one-line banner: `> **Unapproved draft.** Derived from approved records.` (or `**Release <label>.**`).
+2. `## What <Member> contributed`: a table of the approved human claims that survive, ranked. Two columns, `Type | Claim`: the emoji and label, then the claim with its source (`<session-id>#<ID>`) on a second line after `<br>`. No checkboxes: approval already happened in the records.
+3. `## Net story`: the narrative from step 3.
+4. `## Open questions`: from records, plus unapproved records.
+5. `## AI decisions not yet reviewed`: a one-column table, unticked AI claims only: the decision, then its source and "Never discussed" or "Delegated" on lines after `<br>`.
+6. `<details><summary>Counts</summary>`: stats output as a two-column table (sessions, labels, human:AI ratio, superseded, bulk approvals, relabels, overrides).
+7. `<details><summary>Record details</summary>`: a Field / Value table with rows `kind` = `net-story`, `member`, `covers` (`<first-session-id> → <last-session-id>`), `release` (`false`), `approval` (`pending`). Always last.
 
-Between releases it stays `approval: pending` and is labeled **unapproved** at the top. It is derived, not authoritative.
+Between releases it stays `approval: pending` and carries the unapproved banner. It is derived, not authoritative.
 
 ## 5. Release (only if the author asks)
 
-When the author approves the story, set `release: true`, `approval: individual`, and record the version label they give (e.g. `v1-proposal`). Commit it together with the README update. Never release on your own.
+When the author approves the story, set `release` to `true`, `approval` to `individual` in Record details, change the banner, and record the version label they give (e.g. `v1-proposal`). Commit it together with the README update. Never release on your own.
 
 ## 6. Update the README section
 

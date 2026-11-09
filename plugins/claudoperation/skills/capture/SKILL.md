@@ -26,8 +26,8 @@ Origin rules — getting these wrong is the most serious error a record can make
 - The human picked among several options the AI offered → human **Choice**.
 - The human **added something** to an AI proposal → the addition is a **separate human claim**. Never fold it into the AI claim.
 - The human agreed to a single AI recommendation ("OK", "agreed") → **AI claim**, not a human Choice.
-- The human said "your call" / "I trust your choice" → AI claim marked `— delegated, not reviewed`.
-- The AI decided something the human never responded to → AI claim marked `— never discussed`.
+- The human said "your call" / "I trust your choice" → AI claim with a `Delegated, not reviewed` line.
+- The AI decided something the human never responded to → AI claim with a `Never discussed` line.
 - The human reversed or narrowed **their own** earlier decision → **Direction**, with `supersedes:` or `refines:` pointing at the earlier claim. Correction is only for fixing the AI.
 - Origination only if the idea does not appear earlier in the session as an AI proposal. Otherwise it is a Choice, Correction or AI claim.
 - Verification only if the human says what they checked and how. Otherwise Acceptance, or no claim.
@@ -51,7 +51,9 @@ Mark the top 3 human claims as key, each with a *Why key* phrase of under 15 wor
 
 ## 5. Write
 
-- Summary: at most 2 sentences about what the human did.
+- Title: `# <Member>: <topic in a few words>`. Summary: one plain paragraph under it, at most 2 sentences about what the human did.
+- Claims go in tables as SPEC.md section 4 and 6 show: two columns, the Approve cell (`☐ H1<br>🎯 Direction`) and the claim cell. The claim comes first and gets most of the width; *Why key*, relations and "Never discussed" go on lines after it, after `<br>`, never in the claim text.
+- Metadata goes last, in the collapsed Record details table (no frontmatter). Nothing a reader must decode comes before the summary.
 - Each claim: one idea, about 25 words at most, stated as the decision, plain words, jargon defined or avoided.
 - IDs in conversation order; ranking reorders lines, never renumbers them.
 - Add `supersedes`, `refines`, `led_to`, `depends_on` relations where clear, using `<session-id>#<ID>` for other sessions.
@@ -67,18 +69,18 @@ node <skill-folder>/scripts/validate.mjs sessions/<member>/<session-id>.md
 
 If `node` is not available, check by hand:
 
-- [ ] Frontmatter complete; `approval: pending`
-- [ ] Every Correction has `corrects:`; every Verification has `checked:`
+- [ ] Record details table complete; `approval` is `pending`; no frontmatter
+- [ ] Every Correction has a `corrects:` line; every Verification has a `checked:` line
 - [ ] No human addition hidden inside an AI claim
-- [ ] At most 3 key claims, each with *Why key*
-- [ ] Summary plus key claims fit on one screen
+- [ ] At most 3 key claims, each with `**Why key:**` under the claim
+- [ ] Title, summary and key table fit on one screen
 - [ ] Every key decision from the recall list is present
 
 ## 7. Hand over for approval
 
 - Write the file to `sessions/<member>/<session-id>.md`.
 - Show the author the summary, the key claims, and counts: human claims, AI claims, never discussed, delegated.
-- Approval by product type: `functional` → the author replies "ok" or lists corrections (`by-exception`); `endorsed` → the author ticks claims and endorsements in the file, the PR, or with `/clop:approve`, the approval pane in Claude Code (`individual`).
-- **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/clop:approve`, which opens the newest pending record in the approval pane. Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
+- Approval by product type: `functional` → the author replies "ok" or lists corrections (`by-exception`); `endorsed` → the author ticks claims and endorsements in the file, the PR, or with `/claudoperation-approve`, the approval pane in Claude Code (`individual`).
+- **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/claudoperation-approve`, which opens the newest pending record in the approval pane. Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
 - Apply the author's corrections exactly, note them in Links and evidence as `author: <change>`, and set `approval`.
 - End your reply with the marker on its own line: `[claudoperation:captured <session-id>]`
