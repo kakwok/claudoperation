@@ -66,7 +66,7 @@ The skills work in the Claude app; the approval pane does not, because it only e
 
 1. Work with Claude as usual.
 2. Run `/claudoperation:capture`. Claude writes `sessions/<you>/<date>-<slug>.md`.
-3. Run `/claudoperation-approve` (it opens the newest pending record), tick what's right, fix labels, save.
+3. Run `/claudoperation-approve` (it lists your records, pending first; pick one, or pass a path to open it directly), tick what's right, fix labels, save.
 4. Commit the record with your product changes.
 
 Without the pane, edit the checkboxes in the file directly, or reply "ok" with any corrections.

@@ -81,6 +81,6 @@ If `node` is not available, check by hand:
 - Write the file to `sessions/<member>/<session-id>.md`.
 - Show the author the summary, the key claims, and counts: human claims, AI claims, never discussed, delegated.
 - Approval by product type: `functional` → the author replies "ok" or lists corrections (`by-exception`); `endorsed` → the author ticks claims and endorsements in the file, the PR, or with `/claudoperation-approve`, the approval pane in Claude Code (`individual`).
-- **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/claudoperation-approve`, which opens the newest pending record in the approval pane. Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
+- **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/claudoperation-approve`, which lists the session records in the approval pane (the author picks the new one). Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
 - Apply the author's corrections exactly, note them in Links and evidence as `author: <change>`, and set `approval`.
 - End your reply with the marker on its own line: `[claudoperation:captured <session-id>]`

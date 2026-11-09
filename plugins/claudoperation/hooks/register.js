@@ -18,19 +18,39 @@ function startDraft(path, source) {
   for (const c of parsed.ai) draft.ai[c.id] = { checked: c.checked }
 }
 
-// The newest record under sessions/<member>/ still marked approval: pending
-async function findPending($) {
-  if (!(await $.fs.exists('sessions'))) return null
+// Every record under sessions/<member>/, newest first, with its approval state
+let list = null
+async function loadList($) {
   const found = []
-  for (const member of await $.fs.list('sessions')) {
-    if (member.kind !== 'dir') continue
-    for (const f of await $.fs.list('sessions/' + member.name)) {
-      if (f.kind === 'file' && f.name.endsWith('.md')) found.push('sessions/' + member.name + '/' + f.name)
+  if (await $.fs.exists('sessions')) {
+    for (const member of await $.fs.list('sessions')) {
+      if (member.kind !== 'dir') continue
+      for (const f of await $.fs.list('sessions/' + member.name)) {
+        if (f.kind === 'file' && f.name.endsWith('.md')) found.push('sessions/' + member.name + '/' + f.name)
+      }
     }
   }
-  found.sort().reverse()
+  found.sort((a, b) => a.split('/').pop().localeCompare(b.split('/').pop())).reverse()
+  list = []
   for (const path of found) {
-    if (parseRecord(await $.fs.read(path)).frontmatter.approval === "pending") return path
+    const p = parseRecord(await $.fs.read(path))
+    list.push({
+      path,
+      member: path.split('/')[1],
+      name: path.split('/').pop().replace(/\.md$/, ''),
+      approval: p.frontmatter.approval || 'unknown',
+      ticked: p.human.filter((c) => c.checked).length,
+      total: p.human.length,
+    })
+  }
+}
+
+async function openRecord($, path) {
+  if (!(await $.fs.exists(path))) return 'No such file: ' + path
+  startDraft(path, await $.fs.read(path))
+  if (!rec.parsed.human.length) {
+    rec = null
+    return 'No claims found in ' + path
   }
   return null
 }
@@ -83,17 +103,21 @@ export function register(on) {
     await $.command.register({
       name: 'claudoperation-approve',
       description: 'Approve a Claudoperation session record in a pane',
-      argumentHint: '[record path]',
+      argumentHint: '[record path] (omit to pick from a list)',
     })
     return next(e)
   })
 
   on('command.run', { command: 'claudoperation-approve' }, async ($, e) => {
-    const path = (e.args || '').trim() || (await findPending($))
-    if (!path) return { text: 'No pending record under sessions/. Pass a path: /claudoperation-approve <record.md>' }
-    if (!(await $.fs.exists(path))) return { text: 'No such file: ' + path }
-    startDraft(path, await $.fs.read(path))
-    if (!rec.parsed.human.length) return { text: 'No claims found in ' + path }
+    const path = (e.args || '').trim()
+    rec = null
+    if (path) {
+      const err = await openRecord($, path)
+      if (err) return { text: err }
+    } else {
+      await loadList($)
+      if (!list.length) return { text: 'No records under sessions/. Pass a path: /claudoperation-approve <record.md>' }
+    }
     await $.ui.open({ id: PANE, title: 'Approve record', focus: true, closeOnEscape: true })
     return {}
   })
@@ -101,7 +125,31 @@ export function register(on) {
   on('ui.render', { component: 'Pane' }, async ($, e, next) => {
     if (e.requestId !== PANE) return next(e)
     const { Box, Text, Button, Select, Input } = $.ui.resolve(e)
-    if (!rec) return Text({ children: ['No record open. Run /claudoperation-approve.'] })
+    if (!rec) {
+      const pending = (list || []).filter((x) => x.approval === 'pending').length
+      return Box({
+        flexDirection: 'column',
+        children: [
+          Text({ bold: true, children: ['Session records  (' + pending + ' pending). Enter opens one.'] }),
+          Text({ children: [' '] }),
+          ...(list || []).map((x, i) =>
+            Button({
+              key: 'rec-' + x.path,
+              label: (x.approval === 'pending' ? '[ ] ' : '[x] ') + x.name + '  ' + x.member + '  ' + x.ticked + '/' + x.total + ' claims  ' + x.approval,
+              plain: true,
+              ...(i === 0 ? { autoFocus: true } : {}),
+              onPress: async () => {
+                const err = await openRecord($, x.path)
+                if (err) $.ui.toast(err)
+                $.ui.invalidate('ui.render')
+              },
+            }),
+          ),
+          Text({ children: [' '] }),
+          Button({ key: 'close', label: 'Close', hotkey: 'c', plain: true, onPress: async () => { await $.ui.close({ id: PANE }) } }),
+        ],
+      })
+    }
     const r = rec.parsed
     const redraw = () => $.ui.invalidate('ui.render')
     const endorsed = r.frontmatter.product_type !== 'functional'
@@ -198,8 +246,9 @@ export function register(on) {
             onPress: async () => {
               if (await save($)) {
                 rec = null
-                await $.ui.close({ id: PANE })
-              } else redraw()
+                await loadList($)
+              }
+              redraw()
             },
           }),
           Button({
@@ -228,10 +277,10 @@ export function register(on) {
           }),
           Button({
             key: 'cancel',
-            label: 'Cancel',
+            label: 'Back to list',
             hotkey: 'c',
             plain: true,
-            onPress: async () => { rec = null; await $.ui.close({ id: PANE }) },
+            onPress: async () => { rec = null; await loadList($); redraw() },
           }),
         ],
       }),

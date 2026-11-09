@@ -112,13 +112,16 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
   const written = new Map<string, string>()
   stubFiles(on, written)
 
-  // No argument: the command finds the newest pending record itself
+  // No argument: the pane lists the records, and pressing one opens it
   expect(await $.command.run({ command: 'claudoperation-approve', args: '' })).toEqual({})
   const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ key: 'rec-' + PATH })).toMatchObject({ props: { label: expect.stringContaining('pending') } })
+  await ui.press({ key: 'rec-' + PATH })
 
   await ui.press({ key: 'h-H1' })
   await ui.press({ key: 'h-H2' })
   // Relabel H3 as Verification: the pane asks for what was checked
+  await ui.press({ key: 'labels' })
   await ui.select({ key: 'l-H3', value: 'Verification' })
   expect(await ui.find({ key: 'ev-H3' })).toBeDefined()
 
