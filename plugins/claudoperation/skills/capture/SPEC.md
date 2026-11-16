@@ -1,4 +1,4 @@
-# Claudoperation session record format — v0.2
+# Claudoperation session record format — v0.3
 
 A session record is a short Markdown file that tells a teammate what a human did in one working session with Claude. It is written by Claude, approved by the human, and kept beside the product. It reads like a short page, not like data: a title, a summary, and claim tables. The metadata sits at the end, collapsed.
 
@@ -17,7 +17,7 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 
 | Field | Required | Values |
 | --- | --- | --- |
-| `claudoperation` | yes | Format version, `0.2` |
+| `claudoperation` | yes | Format version, `0.3` |
 | `session` | yes | The session ID |
 | `member` | yes | Author's handle, same as the folder name |
 | `product` | yes | What the session contributed to: a repo path, document, or PR |
@@ -32,10 +32,11 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 3. **`## What <Member> did`** — a table of at most 3 key human claims, the most influential first, each with a *Why key* phrase in Notes.
 4. **`<details><summary>Also (N more)</summary>`** — the remaining human claims, ranked, in the same table format, collapsed. Omit if there are none.
 5. **`## AI decisions`** — an accuracy checkbox line, then a table of AI claims ranked by influence (section 6).
-6. **`## Open questions`** — optional; unresolved items, one line each.
-7. **`<details><summary>Links and evidence</summary>`** — optional; pointers into the product.
-8. **`## Endorsements`** — optional; appended later by teammates (section 6).
-9. **`<details><summary>Record details</summary>`** — the metadata (section 2). Always last.
+6. **`<details><summary>Minor details (N)</summary>`** — optional; small items that fail the teammate test (section 4a). No boxes.
+7. **`## Open questions`** — optional; unresolved items, one line each.
+8. **`<details><summary>Links and evidence</summary>`** — optional; pointers into the product.
+9. **`## Endorsements`** — optional; appended later by teammates (section 6).
+10. **`<details><summary>Record details</summary>`** — the metadata (section 2). Always last.
 
 The title, summary and key table must fit on one screen.
 
@@ -66,6 +67,28 @@ Two columns, so the claim gets most of the width:
 
 One label per claim. A claim missing its required evidence falls back to the next weaker label. Validators read the label word; the emoji is for readers.
 
+## 4a. Minor details
+
+A human claim gets an Approve box only if it passes the **teammate test**: a teammate reading just this record would change what they do or believe. Premise, goal, scope, design, constraints, corrections of the AI, and facts others must know pass. Wording, naming, formatting, ordering and one-line tweaks do not.
+
+Items that fail go in a collapsed block, plain bullets, no boxes, no labels, no relations:
+
+```
+<details><summary>Minor details (3)</summary>
+
+- M1 Renamed 'Personnel' to 'Staff costs'.
+- M2 Moved the footnote under the table.
+- M3 AI: switched the table font to match the template (never discussed).
+
+</details>
+```
+
+- IDs are `M1`, `M2`, …, unique within the session. AI-originated items start with `AI:` and may end with `(never discussed)` or `(delegated)`.
+- They are covered by the one accuracy tick, worded `☐ All AI claims and minor details below are recorded accurately`. The line is required when the record has AI claims or minor details.
+- They are not counted in the human:AI ratio and not used in the net story. A boxed item inside the block is a validation error.
+- A claim that fails the test but is a key decision's evidence or is depended on by a boxed claim stays boxed.
+- There is no fixed cap on boxed claims; the test decides. If more than about 12 still pass, capture suggests splitting the session.
+
 ## 5. Relations
 
 Written in the claim cell, one line per relation after `<br>`:
@@ -90,8 +113,8 @@ Written in the claim cell, one line per relation after `<br>`:
 | ☐ A1 | <claim><br>Never discussed |
 ```
 
-- **ID**: `A1`, `A2`, … No label in v0.2.
-- The line above the table confirms all AI claims are accurately recorded. Each Endorse box means *endorsed*: a human checked the decision and agrees. Unticked means recorded, not reviewed.
+- **ID**: `A1`, `A2`, … No label.
+- The line above the table confirms all AI claims are accurately recorded (and the minor details, if the record has any: `All AI claims and minor details below are recorded accurately`). Each Endorse box means *endorsed*: a human checked the decision and agrees. Unticked means recorded, not reviewed.
 - After the claim, on lines after `<br>`: `Never discussed` (the AI decided something the human never responded to), `Delegated, not reviewed` (the human explicitly left it to the AI), and any relations (section 5).
 - Later endorsement by any teammate is appended, never edited in place:
 

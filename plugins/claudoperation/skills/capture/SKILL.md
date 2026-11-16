@@ -34,9 +34,15 @@ Origin rules — getting these wrong is the most serious error a record can make
 
 Superseded claims stay in the record, with the relation, ranked low.
 
+### Teammate test: boxed claim or minor detail
+
+Give a human claim an Approve box only if a teammate reading just this record would change what they do or believe: premise, goal, scope, design, constraints, corrections of the AI, facts others must know. Wording, naming, formatting, ordering and one-line tweaks fail. Put those, and small AI decisions of the same kind, in the collapsed **Minor details** block (`- M1 …`, no boxes, no labels; SPEC.md section 4a). Do not cap the boxed claims by count: the test decides. Keep a failing claim boxed if a boxed claim depends on it.
+
+If nothing passes the test (a fix-only session), write no record. Tell the author why in one sentence and add the marker.
+
 ## 3. Recall check
 
-Before ranking, list for yourself every decision that changed the product or the plan. Each must map to a claim. Minor inputs may be dropped; **a key decision may never be dropped.** For `functional` products, keep only design-level decisions.
+Before ranking, list for yourself every decision that changed the product or the plan. Each must map to a claim. Minor inputs go to Minor details, never dropped silently; **a key decision may never be dropped.** For `functional` products, keep only design-level decisions.
 
 ## 4. Rank
 
@@ -57,7 +63,8 @@ Mark the top 3 human claims as key, each with a *Why key* phrase of under 15 wor
 - Each claim: one idea, about 25 words at most, stated as the decision, plain words, jargon defined or avoided.
 - IDs in conversation order; ranking reorders lines, never renumbers them.
 - Add `supersedes`, `refines`, `led_to`, `depends_on` relations where clear, using `<session-id>#<ID>` for other sessions.
-- More than about 12 human claims: still write the record, and add an Open question suggesting the session be split at a named boundary.
+- Minor details: a collapsed `<details><summary>Minor details (N)</summary>` after the AI table; the accuracy line then reads `All AI claims and minor details below are recorded accurately`.
+- More than about 12 boxed human claims: still write the record, and add an Open question suggesting the session be split at a named boundary.
 
 ## 6. Self-check
 
@@ -75,11 +82,12 @@ If `node` is not available, check by hand:
 - [ ] At most 3 key claims, each with `**Why key:**` under the claim
 - [ ] Title, summary and key table fit on one screen
 - [ ] Every key decision from the recall list is present
+- [ ] Every boxed claim passes the teammate test; the rest are in Minor details with no boxes
 
 ## 7. Hand over for approval
 
 - Write the file to `sessions/<member>/<session-id>.md`.
-- Show the author the summary, the key claims, and counts: human claims, AI claims, never discussed, delegated.
+- Show the author the summary, the key claims, and counts: human claims, minor details, AI claims, never discussed, delegated.
 - Approval by product type: `functional` → the author replies "ok" or lists corrections (`by-exception`); `endorsed` → the author ticks claims and endorsements in the file, the PR, or with `/claudoperation-approve`, the approval pane in Claude Code (`individual`).
 - **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/claudoperation-approve`, which lists the session records in the approval pane (the author picks the new one). Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
 - Apply the author's corrections exactly, note them in Links and evidence as `author: <change>`, and set `approval`.

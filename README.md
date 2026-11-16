@@ -20,6 +20,8 @@ Claudoperation turns each session into a short record the author approves. Teamm
 
 `/claudoperation-approve` opens the capture record in a pane (an example record is shown). You tick the claims that are accurate, press `l` to fix labels, add evidence where a label needs it, and endorse the AI decisions you checked.
 
+Only claims a teammate needs to read get an approve box. Small edits (wording, naming, formatting) go in a collapsed "Minor details" list with no boxes, covered by one accuracy tick.
+
 <p align="center">
   <img src="docs/approve-pane.svg" width="760" alt="The /claudoperation-approve pane showing an example record with approve checkboxes, label dropdowns, an evidence prompt, endorse checkboxes for AI decisions, and Save, Approve all and Cancel buttons.">
 </p>

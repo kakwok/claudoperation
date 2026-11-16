@@ -203,17 +203,28 @@ export function register(on) {
       }
     })
 
-    if (r.ai.length) {
+    if (r.ai.length || r.minor.length) {
       rows.push(Text({ children: [' '] }))
-      rows.push(Text({ bold: true, children: ['AI decisions'] }))
+      rows.push(Text({ bold: true, children: [r.minor.length ? 'AI decisions and minor details' : 'AI decisions'] }))
       rows.push(
         Button({
           key: 'acc',
-          label: (draft.accuracy ? '[x]' : '[ ]') + ' All AI claims are recorded accurately',
+          label: (draft.accuracy ? '[x]' : '[ ]') + (r.minor.length ? ' All AI claims and minor details are recorded accurately' : ' All AI claims are recorded accurately'),
           plain: true,
           onPress: () => { draft.accuracy = !draft.accuracy; redraw() },
         }),
       )
+      if (r.minor.length) {
+        rows.push(
+          Button({
+            key: 'minor',
+            label: (draft.showMinor ? '[-] ' : '[+] ') + r.minor.length + ' minor details (no approval needed, covered by the tick above)',
+            plain: true,
+            onPress: () => { draft.showMinor = !draft.showMinor; redraw() },
+          }),
+        )
+        if (draft.showMinor) for (const m of r.minor) rows.push(Text({ key: 'm-' + m.id, wrap: 'wrap', dimColor: true, children: ['    ' + m.id + ' ' + m.text] }))
+      }
       for (const c of r.ai) {
         const d = draft.ai[c.id]
         const text = c.id + ' ' + c.text

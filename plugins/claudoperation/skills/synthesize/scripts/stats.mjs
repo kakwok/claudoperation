@@ -21,7 +21,7 @@ const files = args.flatMap((a) =>
 
 const labels = Object.fromEntries(Object.keys(LABELS).map((l) => [l, 0]))
 const out = {
-  sessions: 0, pending: [], humanClaims: 0, approvedHuman: 0, aiClaims: 0,
+  sessions: 0, pending: [], humanClaims: 0, approvedHuman: 0, aiClaims: 0, minorDetails: 0,
   labels, superseded: 0, unreviewedAI: [], bulkApprovals: [], relabels: 0, overrides: 0,
   ratio: null, span: null, records: [],
 }
@@ -49,6 +49,7 @@ for (const { id, r, src } of records) {
   out.overrides += (src.match(/author: override/gi) || []).length
   out.humanClaims += r.human.length
   out.aiClaims += r.ai.length
+  out.minorDetails += r.minor.length
   for (const c of r.human) {
     if (c.checked) { out.approvedHuman++; if (c.label in labels) labels[c.label]++ }
     if (superseded.has(`${id}#${c.id}`)) out.superseded++

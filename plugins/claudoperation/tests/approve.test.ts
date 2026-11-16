@@ -22,12 +22,20 @@ Ana chose the detector layout and fixed a wrong trigger rate.
 
 ## AI decisions
 
-☐ All AI claims below are recorded accurately
+☐ All AI claims and minor details below are recorded accurately
 
 | Endorse | AI decision |
 | :-- | --- |
 | ☐ A1 | Use a two-column table for the budget |
 | ☐ A2 | Section order follows the call text<br>Never discussed |
+
+<details><summary>Minor details (3)</summary>
+
+- M1 Renamed the "Notes" column to "Evidence" in the draft table.
+- M2 Moved the label legend below the table.
+- M3 AI: used sentence case for all headings (never discussed).
+
+</details>
 
 <details><summary>Links and evidence</summary>
 
@@ -38,7 +46,7 @@ Ana chose the detector layout and fixed a wrong trigger rate.
 
 | Field | Value |
 | --- | --- |
-| claudoperation | 0.2 |
+| claudoperation | 0.3 |
 | session | 2026-11-04-demo |
 | member | ana |
 | product | proposal/main.tex |
@@ -89,6 +97,9 @@ test('the parser reads claims, key marks, relations and AI notes', async () => {
   expect(r.human.map((c) => c.isKey)).toEqual([true, true, false])
   expect(r.human[1].relations).toEqual([{ kind: 'corrects', value: 'AI assumed 1 MHz' }])
   expect(r.ai[1].note).toBe('never discussed')
+  expect(r.minor.map((m) => m.id)).toEqual(['M1', 'M2', 'M3'])
+  expect(r.human.length).toBe(3)
+  expect(validateRecord(RECORD.replace('- M1 ', '- [ ] M1 ')).errors.join()).toContain('minor details: items take no checkbox')
   expect(validateRecord(RECORD).errors).toEqual([])
 })
 
@@ -139,10 +150,11 @@ test('the pane approves, relabels with evidence, endorses, and saves', async ($,
   expect(out).toContain('| ☑ H1<br>🔀 Choice')
   expect(out).toContain('| ☑ H2<br>🛠️ Correction')
   expect(out).toContain('| ☐ H3<br>✅ Verification | The 2024 test beam used 120 GeV pions.<br>checked: compared with the 2024 run log |')
-  expect(out).toContain('☑ All AI claims below are recorded accurately')
+  expect(out).toContain('☑ All AI claims and minor details below are recorded accurately')
   expect(out).toContain('| ☑ A1 | Use a two-column table')
   expect(out).toContain('| ☐ A2 | Section order')
   expect(out).toContain('| approval | individual |')
+  expect(out).toContain('- M2 Moved the label legend below the table.')
   expect(out).toContain('- author: H3 relabeled Knowledge → Verification')
   expect(validateRecord(out).errors).toEqual([])
 })
@@ -161,6 +173,6 @@ test('approve all needs a second press and never endorses AI decisions', async (
   const out = written.get(PATH)
   expect(out).toContain('| approval | bulk |')
   expect(out).toContain('| ☑ H3<br>📚 Knowledge')
-  expect(out).toContain('☑ All AI claims below are recorded accurately')
+  expect(out).toContain('☑ All AI claims and minor details below are recorded accurately')
   expect(out).toContain('| ☐ A1 | Use a two-column table')
 })

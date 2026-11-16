@@ -25,7 +25,7 @@ Martin made cooperation the main goal and credit a side effect. He pushed back o
 
 ## AI decisions
 
-☐ All AI claims below are recorded accurately
+☐ All AI claims and minor details below are recorded accurately
 
 | Endorse | AI decision |
 | :-- | --- |
@@ -36,6 +36,14 @@ Martin made cooperation the main goal and credit a side effect. He pushed back o
 | ☐ A5 | Incremental capture from the last marker in a long chat |
 | ☐ A6 | Label-reliability (kappa) check in the solo pilot |
 | ☐ A7 | `synthesize` nudges after about 5 captures<br>Never discussed |
+
+<details><summary>Minor details (3)</summary>
+
+- M1 Renamed the "Notes" column to "Evidence" in the draft table.
+- M2 Moved the label legend below the table.
+- M3 AI: used sentence case for all headings (never discussed).
+
+</details>
 
 ## Open questions
 - Will the team tolerate editing a Markdown draft?
@@ -51,7 +59,7 @@ Martin made cooperation the main goal and credit a side effect. He pushed back o
 
 | Field | Value |
 | --- | --- |
-| claudoperation | 0.2 |
+| claudoperation | 0.3 |
 | session | 2026-11-02-taxonomy-workflow |
 | member | martin |
 | product | claudoperation/docs/design.md |

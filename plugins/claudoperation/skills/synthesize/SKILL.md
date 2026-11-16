@@ -32,7 +32,8 @@ If `node` is unavailable, count from the records and say the counts were manual.
 2. For `refines:` chains, state only the final form.
 3. Group what remains by decision, ranked by influence (downstream dependency, reversal, scope, label), as in capture.
 4. Write the story as the change from A to C: where the work stood, what the human decided, where it stands now. At most about 300 words, one idea per sentence, jargon defined, led by the decision.
-5. Never add a claim, relation or label that is not in an approved record. AI claims appear only in "AI decisions not yet reviewed" unless endorsed.
+5. Minor details (`M` items) stay out of the story, the labels and the human:AI ratio; report only their count in the Counts block.
+6. Never add a claim, relation or label that is not in an approved record. AI claims appear only in "AI decisions not yet reviewed" unless endorsed.
 
 ## 4. Write the file
 

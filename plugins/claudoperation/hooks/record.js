@@ -1,5 +1,5 @@
 // Claudoperation session record: parse, validate, and apply approvals.
-// Format: skills/capture/SPEC.md (v0.2). Pure functions, no I/O, so the
+// Format: skills/capture/SPEC.md (v0.3). Pure functions, no I/O, so the
 // approval mod, the validator script, and tests all share one parser.
 // A record reads as a story: title, summary, claim tables. Its metadata sits
 // in a collapsed "Record details" table at the end.
@@ -29,7 +29,9 @@ const REF_RE = /^(\d{4}-\d{2}-\d{2}-[a-z0-9-]+)?#[HA]\d+$/
 
 const HUMAN_ROW_RE = /^\s*\|\s*([☐☑])\s*(H\d+)\b/u
 const AI_ROW_RE = /^\s*\|\s*([☐☑])\s*(A\d+)\b/u
-const ACCURACY_RE = /^(\s*)([☐☑]) All AI claims below are recorded accurately/u
+const ACCURACY_RE = /^(\s*)([☐☑]) All AI claims (?:and minor details )?below are recorded accurately/u
+const MINOR_RE = /^\s*-\s+(M\d+)\s+(.*\S)\s*$/
+const MINOR_BOX_RE = /^\s*-\s+(?:\[[ xX]\]|[☐☑])/u
 const META_ROW_RE = /^\s*\|\s*([a-z_]+)\s*\|\s*(.*?)\s*\|\s*$/
 const WHY_RE = /^\*\*Why key:\*\*\s*/
 
@@ -73,17 +75,28 @@ function parseNotes(cell) {
 export function parseRecord(source) {
   const lines = source.split('\n')
   const record = {
-    title: null, frontmatter: {}, summary: null, human: [], ai: [], accuracy: null,
+    title: null, frontmatter: {}, summary: null, human: [], ai: [], minor: [], minorBoxes: [], accuracy: null,
     hasKeySection: false, lines,
   }
   let inKey = false
   let inMeta = false
+  let inMinor = false
   let inSummary = true
   let summary = []
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     if (/^# /.test(line) && record.title === null) { record.title = line.slice(2).trim(); continue }
     if (line.startsWith('<details><summary>Record details')) { inMeta = true; inKey = false; continue }
+    if (line.startsWith('<details><summary>Minor details')) { inMinor = true; inKey = false; continue }
+    if (inMinor) {
+      if (line.startsWith('</details>')) inMinor = false
+      else if (MINOR_BOX_RE.test(line)) record.minorBoxes.push(i)
+      else {
+        const mm = line.match(MINOR_RE)
+        if (mm) record.minor.push({ id: mm[1], text: mm[2], line: i })
+      }
+      continue
+    }
     if (inMeta) {
       if (line.startsWith('</details>')) inMeta = false
       else {
@@ -157,7 +170,7 @@ export function validateRecord(source, { filename } = {}) {
   if (r.human.length > 12) warnings.push(`${r.human.length} human claims: consider splitting the session`)
 
   const seen = new Set()
-  for (const c of [...r.human, ...r.ai]) {
+  for (const c of [...r.human, ...r.ai, ...r.minor]) {
     if (seen.has(c.id)) errors.push(`${c.id}: duplicate id`)
     seen.add(c.id)
   }
@@ -181,7 +194,8 @@ export function validateRecord(source, { filename } = {}) {
     }
   }
 
-  if (r.ai.length && !r.accuracy) errors.push('AI decisions: missing the "All AI claims below are recorded accurately" checkbox')
+  if ((r.ai.length || r.minor.length) && !r.accuracy) errors.push('AI decisions: missing the "All AI claims and minor details below are recorded accurately" checkbox')
+  if (r.minorBoxes.length) errors.push('minor details: items take no checkbox, they are covered by the accuracy tick')
 
   return { errors, warnings, record: r }
 }
