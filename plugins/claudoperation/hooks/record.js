@@ -1,5 +1,5 @@
 // Claudoperation session record: parse, validate, and apply approvals.
-// Format: skills/capture/SPEC.md (v0.3). Pure functions, no I/O, so the
+// Format: skills/capture/SPEC.md (v0.4). Pure functions, no I/O, so the
 // approval mod, the validator script, and tests all share one parser.
 // A record reads as a story: title, summary, claim tables. Its metadata sits
 // in a collapsed "Record details" table at the end.
@@ -34,6 +34,8 @@ const MINOR_RE = /^\s*-\s+(M\d+)\s+(.*\S)\s*$/
 const MINOR_BOX_RE = /^\s*-\s+(?:\[[ xX]\]|[☐☑])/u
 const META_ROW_RE = /^\s*\|\s*([a-z_]+)\s*\|\s*(.*?)\s*\|\s*$/
 const WHY_RE = /^\*\*Why key:\*\*\s*/
+// Context lines a key claim may carry, in this order, before Why key (v0.4)
+const CONTEXT_RE = /^\*\*(Before|Now|Example):\*\*\s*/
 
 // Cells of one table row, raw (escaped pipes kept) and trimmed
 export function splitCells(line) {
@@ -56,9 +58,13 @@ function splitClaim(cell) {
 function parseNotes(cell) {
   const items = cell.split(BR).map((s) => s.trim()).filter(Boolean)
   let why = null
+  const context = { before: null, now: null, example: null }
+  const order = [] // the context and why lines in the order written
   const rest = []
   for (const item of items) {
-    if (WHY_RE.test(item)) why = unescape(item.replace(WHY_RE, '').trim())
+    const cm = item.match(CONTEXT_RE)
+    if (WHY_RE.test(item)) { why = unescape(item.replace(WHY_RE, '').trim()); order.push('why') }
+    else if (cm) { context[cm[1].toLowerCase()] = unescape(item.replace(CONTEXT_RE, '').trim()); order.push(cm[1].toLowerCase()) }
     else rest.push(item)
   }
   const relText = rest.join(', ')
@@ -69,7 +75,7 @@ function parseNotes(cell) {
     const value = relText.slice(m.index + m[0].length, end).replace(/[,.\s]+$/, '').trim()
     relations.push({ kind: m[1], value: unescape(value) })
   })
-  return { why, relations, text: unescape(rest.join(' ')) }
+  return { why, context, order, relations, text: unescape(rest.join(' ')) }
 }
 
 export function parseRecord(source) {
@@ -122,7 +128,8 @@ export function parseRecord(source) {
       const notes = parseNotes(rest)
       record.human.push({
         id: m[2], checked: m[1] === ON, emoji: type?.[1] || null, label: type?.[2] || typeText.trim(),
-        text: unescape(claim), relations: notes.relations, why: notes.why, isKey: inKey, line: i,
+        text: unescape(claim), relations: notes.relations, why: notes.why, before: notes.context.before, now: notes.context.now,
+        example: notes.context.example, noteOrder: notes.order, isKey: inKey, line: i,
       })
       continue
     }
@@ -160,7 +167,7 @@ export function validateRecord(source, { filename } = {}) {
   if (r.summary === null) errors.push('summary: missing the summary paragraph under the title')
   else {
     if (sentences(r.summary).length > 2) errors.push('summary: more than 2 sentences')
-    if (r.summary.split(/\s+/).length > 60) warnings.push('summary: over about 60 words')
+    if (r.summary.split(/\s+/).length > 75) warnings.push('summary: over about 70 words')
   }
 
   if (!r.hasKeySection) errors.push('missing "## What <member> did" section')
@@ -182,7 +189,14 @@ export function validateRecord(source, { filename } = {}) {
     if (!c.isKey && c.why) warnings.push(`${c.id}: "Why key" on a claim outside the key table`)
     const need = EVIDENCE[c.label]
     if (need && !c.relations.some((rel) => rel.kind === need)) errors.push(`${c.id}: ${c.label} needs a "${need}:" relation`)
-    if (c.text.split(/\s+/).length > 30) warnings.push(`${c.id}: claim over about 25 words`)
+    const hasContext = c.before || c.now || c.example
+    if (!c.isKey && hasContext) errors.push(`${c.id}: Before/Now/Example lines are for key claims only`)
+    const order = c.noteOrder.filter((k) => k !== 'why')
+    if (order.join() !== ['before', 'now', 'example'].filter((k) => order.includes(k)).join()) errors.push(`${c.id}: context lines must run Before, Now, Example`)
+    if (c.noteOrder.includes('why') && c.noteOrder.indexOf('why') < c.noteOrder.length - 1) errors.push(`${c.id}: "Why key" comes after the Before/Now/Example lines`)
+    if (c.before && c.relations.some((rel) => rel.kind === 'corrects')) errors.push(`${c.id}: a "corrects:" line already says what was before; drop "Before:"`)
+    const words = c.text.split(/\s+/).length
+    if (c.isKey ? words > 55 : words > 30) warnings.push(`${c.id}: claim over about ${c.isKey ? 50 : 25} words`)
   }
 
   for (const c of [...r.human, ...r.ai]) {

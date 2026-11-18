@@ -176,3 +176,36 @@ test('approve all needs a second press and never endorses AI decisions', async (
   expect(out).toContain('☑ All AI claims and minor details below are recorded accurately')
   expect(out).toContain('| ☐ A1 | Use a two-column table')
 })
+
+// A key claim with its own context (v0.4); neutral invented content
+const CONTEXT_RECORD = RECORD.replace(
+  '| ☐ H1<br>🔀 Choice | Picked layout B over A.<br>**Why key:** sets the geometry. |',
+  '| ☐ H1<br>🔀 Choice | The office floor plan uses layout B: desks in pods of four, not rows.<br>**Before:** desks stood in long rows.<br>**Now:** pods of four with a shared whiteboard.<br>**Example:** the second-floor team moved first.<br>**Why key:** sets the geometry. |',
+)
+
+test('key claims may carry Before, Now and Example lines without polluting relations or text', async () => {
+  const r = parseRecord(CONTEXT_RECORD)
+  const h1 = r.human[0]
+  expect(h1.text).toBe('The office floor plan uses layout B: desks in pods of four, not rows.')
+  expect(h1.before).toBe('desks stood in long rows.')
+  expect(h1.now).toBe('pods of four with a shared whiteboard.')
+  expect(h1.example).toBe('the second-floor team moved first.')
+  expect(h1.why).toBe('sets the geometry.')
+  expect(h1.relations).toEqual([])
+  expect(validateRecord(CONTEXT_RECORD).errors).toEqual([])
+  // Ticking a claim leaves its context lines intact
+  const out = applyApproval(CONTEXT_RECORD, { human: { H1: { checked: true } } })
+  expect(out).toContain('| ☑ H1<br>🔀 Choice | The office floor plan')
+  expect(out).toContain('<br>**Before:** desks stood in long rows.<br>**Now:**')
+})
+
+test('the validator holds the context lines to key claims, in order, without a duplicate "before"', async () => {
+  const nonKey = RECORD.replace('| The 2024 test beam used 120 GeV pions. |', '| The 2024 test beam used 120 GeV pions.<br>**Now:** x |')
+  expect(validateRecord(nonKey).errors).toContain('H3: Before/Now/Example lines are for key claims only')
+  const order = CONTEXT_RECORD.replace('**Before:** desks stood in long rows.<br>**Now:** pods of four with a shared whiteboard.', '**Now:** pods of four with a shared whiteboard.<br>**Before:** desks stood in long rows.')
+  expect(validateRecord(order).errors).toContain('H1: context lines must run Before, Now, Example')
+  const afterWhy = CONTEXT_RECORD.replace('<br>**Why key:** sets the geometry.', '').replace('**Example:** the second-floor team moved first.', '**Why key:** sets the geometry.<br>**Example:** the second-floor team moved first.')
+  expect(validateRecord(afterWhy).errors).toContain('H1: "Why key" comes after the Before/Now/Example lines')
+  const dup = RECORD.replace('corrects: AI assumed 1 MHz', 'corrects: AI assumed 1 MHz').replace('<br>**Why key:** changes the budget.', '<br>**Before:** 1 MHz.<br>**Why key:** changes the budget.')
+  expect(validateRecord(dup).errors).toContain('H2: a "corrects:" line already says what was before; drop "Before:"')
+})

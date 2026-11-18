@@ -57,10 +57,13 @@ Mark the top 3 human claims as key, each with a *Why key* phrase of under 15 wor
 
 ## 5. Write
 
-- Title: `# <Member>: <topic in a few words>`. Summary: one plain paragraph under it, at most 2 sentences about what the human did.
+- Title: `# <Member>: <topic in a few words>`. Summary: one plain paragraph under it, at most 2 sentences (about 70 words) about what the human did, written for a teammate who was not in the session: name what was worked on in outsider terms and define any project term inline (or link it to `GLOSSARY.md` if the repo has one) instead of reusing session shorthand.
 - Claims go in tables as SPEC.md section 4 and 6 show: two columns, the Approve cell (`☐ H1<br>🎯 Direction`) and the claim cell. The claim comes first and gets most of the width; *Why key*, relations and "Never discussed" go on lines after it, after `<br>`, never in the claim text.
 - Metadata goes last, in the collapsed Record details table (no frontmatter). Nothing a reader must decode comes before the summary.
 - Each claim: one idea, about 25 words at most, stated as the decision, plain words, jargon defined or avoided.
+- **Key claims carry their own context** (SPEC.md section 4). The claim text says what the thing is (up to about 50 words). After it, in this order and before `**Why key:**`, add as needed: `**Before:**` (what was there; skip it when a `corrects:` line already says it, and write that `corrects:` in plain words), `**Now:**` (what it became, if the claim states only the problem), `**Example:**` (one concrete case a reader can find in the product). Never put these on non-key claims.
+  - Shorthand: `Reports are now tiered by effort, not by size.`
+  - Context: `Each session record now gets a review tier (full, light or none) from how much the human steered it, instead of from how long it is.<br>**Before:** every record got the same review.<br>**Example:** a one-line wording fix gets no review; a change of the product's goal gets full review.`
 - IDs in conversation order; ranking reorders lines, never renumbers them.
 - Add `supersedes`, `refines`, `led_to`, `depends_on` relations where clear, using `<session-id>#<ID>` for other sessions.
 - Minor details: a collapsed `<details><summary>Minor details (N)</summary>` after the AI table; the accuracy line then reads `All AI claims and minor details below are recorded accurately`.
@@ -81,6 +84,8 @@ If `node` is not available, check by hand:
 - [ ] No human addition hidden inside an AI claim
 - [ ] At most 3 key claims, each with `**Why key:**` under the claim
 - [ ] Title, summary and key table fit on one screen
+- [ ] Outsider test: could a teammate who was not in the session say what each key claim means, from the record alone? Every project term in the summary and key claims is defined in place or linked to a glossary
+- [ ] Before/Now/Example lines only on key claims, in that order, before `**Why key:**`; no `**Before:**` beside a `corrects:` line
 - [ ] Every key decision from the recall list is present
 - [ ] Every boxed claim passes the teammate test; the rest are in Minor details with no boxes
 

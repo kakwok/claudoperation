@@ -42,7 +42,7 @@ Path: `sessions/<member>/net/<YYYY-MM-DD>-net.md`. It reads like a short page, n
 Body, in this order (the reader's order):
 
 1. `# <Member>: net story to <last-session-date>`, then a one-line banner: `> **Unapproved draft.** Derived from approved records.` (or `**Release <label>.**`).
-2. `## What <Member> contributed`: a table of the approved human claims that survive, ranked. Two columns, `Type | Claim`: the emoji and label, then the claim with its source (`<session-id>#<ID>`) on a second line after `<br>`. No checkboxes: approval already happened in the records.
+2. `## What <Member> contributed`: a table of the approved human claims that survive, ranked. Two columns, `Type | Claim`: the emoji and label, then the claim with its source (`<session-id>#<ID>`) on a second line after `<br>`. A key claim in a v0.4 record may carry `**Before:**`, `**Now:**` and `**Example:**` lines: restate its claim text with its `**Example:**` where it helps, so the story reads without the session's shorthand; never invent these lines. No checkboxes: approval already happened in the records.
 3. `## Net story`: the narrative from step 3.
 4. `## Open questions`: from records, plus unapproved records.
 5. `## AI decisions not yet reviewed`: a one-column table, unticked AI claims only: the decision, then its source and "Never discussed" or "Delegated" on lines after `<br>`.

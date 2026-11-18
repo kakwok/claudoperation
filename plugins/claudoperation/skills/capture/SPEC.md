@@ -1,4 +1,4 @@
-# Claudoperation session record format — v0.3
+# Claudoperation session record format — v0.4
 
 A session record is a short Markdown file that tells a teammate what a human did in one working session with Claude. It is written by Claude, approved by the human, and kept beside the product. It reads like a short page, not like data: a title, a summary, and claim tables. The metadata sits at the end, collapsed.
 
@@ -17,7 +17,7 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 
 | Field | Required | Values |
 | --- | --- | --- |
-| `claudoperation` | yes | Format version, `0.3` |
+| `claudoperation` | yes | Format version, `0.4` |
 | `session` | yes | The session ID |
 | `member` | yes | Author's handle, same as the folder name |
 | `product` | yes | What the session contributed to: a repo path, document, or PR |
@@ -28,7 +28,7 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 ## 3. Body, in this order
 
 1. **Title** — `# <Member>: <topic in a few words>`.
-2. **Summary** — one plain paragraph under the title, at most 2 sentences and about 60 words. It says what the human did, not what the AI produced.
+2. **Summary** — one plain paragraph under the title, at most 2 sentences and about 70 words. It says what the human did, not what the AI produced, and it names what was worked on in terms an outsider understands: any project term it uses is defined inline (or linked to the repo's `GLOSSARY.md`, if there is one), never reused as session shorthand.
 3. **`## What <Member> did`** — a table of at most 3 key human claims, the most influential first, each with a *Why key* phrase in Notes.
 4. **`<details><summary>Also (N more)</summary>`** — the remaining human claims, ranked, in the same table format, collapsed. Omit if there are none.
 5. **`## AI decisions`** — an accuracy checkbox line, then a table of AI claims ranked by influence (section 6).
@@ -51,7 +51,23 @@ Two columns, so the claim gets most of the width:
 ```
 
 - **Approve cell**: the box, the ID, and the type on a second line. The box is `☐` or `☑`; ticked means the author approves the claim as an accurate account of their contribution. (Task-list boxes do not render inside tables, so the record uses these characters.) The ID is `H1`, `H2`, … unique within the session, numbered in conversation order (so ranking does not renumber them). The type is the emoji and label word (below).
-- **Claim cell**: the claim first, one idea, at most about 25 words, stated as the decision itself. Write a literal pipe as `\|`. Then, each on its own line after `<br>`: for key claims `**Why key:** <phrase>`, then relations (section 5), one per line.
+- **Claim cell**: the claim first, one idea, at most about 25 words, stated as the decision itself. Write a literal pipe as `\|`. Then, each on its own line after `<br>`: for key claims the context lines below and `**Why key:** <phrase>`, then relations (section 5), one per line.
+
+### Key claims carry their own context
+
+A teammate who was not in the session must be able to say what a key claim means from the record alone. So **only the (at most 3) key claims** may exceed the 25-word limit (up to about 50 words, the claim text stating what the thing is) and may add these lines after the claim, in this order, before `**Why key:**`:
+
+| Line | Use |
+| --- | --- |
+| `**Before:** <text>` | what was there before, if a `corrects:` relation does not already say it. For a Correction, write `corrects:` in plain words so it serves as the "before", and omit `**Before:**`. |
+| `**Now:** <text>` | what it became, if the claim states only the problem |
+| `**Example:** <text>` | one concrete case, ideally one a reader can find in the product |
+
+```
+| ☐ H1<br>🎯 Direction | <claim, saying what the thing is><br>**Before:** <what was there><br>**Now:** <what it became><br>**Example:** <one concrete case><br>**Why key:** <phrase> |
+```
+
+Non-key claims stay short and take none of these lines: they are collapsed and read by people who want the detail. A term in the summary or a key claim is defined in place or linked to `GLOSSARY.md`. All three lines are optional, so v0.3 records stay valid.
 
 ### Labels
 
@@ -144,8 +160,13 @@ Relabels, promotions or demotions between key and Also, and dropped claims are n
 
 ## 9. Limits
 
-- At most 3 key claims.
+- At most 3 key claims. Key claims may run to about 50 words and carry Before/Now/Example lines; every other claim is about 25 words with none.
 - More than about 12 human claims in one record means the session should be split; capture says so.
-- Summary at most 2 sentences.
+- Summary at most 2 sentences, about 70 words, written for a reader who was not in the session.
 - No prose narrative in a session record beyond the summary; narrative belongs to `synthesize`.
 - Nothing a reader has to decode comes before the summary: no metadata, IDs or relations above it.
+
+## Changelog
+
+- **v0.4** — Outsider-readable records. The summary defines project terms in place (about 70 words); key claims may add `**Before:**`, `**Now:**` and `**Example:**` lines and run to about 50 words; capture's self-check gains an outsider test. No `audience:` policy option: the extra context is always written, since it is bounded to 3 key claims and a switch would invite the shorthand it replaces.
+- **v0.3** — Minor details tier; table-format records.

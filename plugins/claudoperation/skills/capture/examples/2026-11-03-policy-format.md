@@ -1,14 +1,14 @@
 # Martin: Capture policy and record format
 
-Martin tied the capture policy to the product's purpose and ruled out flagging low-human work. He named capture quality as the crux, set the claims list's job, and asked for claims ranked by influence.
+Martin shaped Claudoperation's capture policy, the per-repo rules for how a session record is written and reviewed: it now depends on what the product is for, and low-human work is not flagged. He also fixed what makes a good record, one that keeps every key decision, and asked that claims be ranked by influence.
 
 ## What Martin did
 
 | Approve | Claim |
 | :-- | --- |
-| ☐ H2<br>💡 Origination | Policy depends on product purpose: endorsed products (a proposal) get review rules; functional code records design decisions only.<br>**Why key:** splits capture, approval and policy into two modes. |
-| ☐ H8<br>🎯 Direction | The claims list aims at recall of key human value: minor inputs may be missed, key decisions must not.<br>**Why key:** defines what capture quality means and how it is tested. |
-| ☐ H10<br>🎯 Direction | Rank claims by influence for the reader; no weighting in analytics.<br>**Why key:** changed the record's layout to key claims plus folded rest.<br>refines: 2026-11-02-taxonomy-workflow#H3 |
+| ☐ H2<br>💡 Origination | The capture policy depends on what the product is for. A proposal is an endorsed product: every claim in its records is reviewed. Working code is a functional product: its records keep design decisions only.<br>**Before:** one set of capture and review rules for every product.<br>**Example:** a grant proposal gets each claim ticked by its author; a code repo records only its design choices.<br>**Why key:** splits capture, approval and policy into two modes. |
+| ☐ H8<br>🎯 Direction | A record is judged by recall of what mattered: a minor input may be missed, but a key human decision must never be dropped.<br>**Now:** capture lists every decision that changed the product or plan before writing, and each one must map to a claim.<br>**Why key:** defines what capture quality means and how it is tested. |
+| ☐ H10<br>🎯 Direction | Claims are ranked by how much they influenced the work, so a reader sees the few that matter first; no weighting is applied in analytics.<br>**Before:** claims were listed in conversation order.<br>**Example:** the top three claims sit in the main table; the other eight fold into an "Also" block.<br>**Why key:** changed the record's layout to key claims plus folded rest.<br>refines: 2026-11-02-taxonomy-workflow#H3 |
 
 <details><summary>Also (8 more)</summary>
 
@@ -54,7 +54,7 @@ Martin tied the capture policy to the product's purpose and ruled out flagging l
 
 | Field | Value |
 | --- | --- |
-| claudoperation | 0.2 |
+| claudoperation | 0.4 |
 | session | 2026-11-03-policy-format |
 | member | martin |
 | product | claudoperation/docs/design.md |
