@@ -9,10 +9,20 @@ const LABEL_OPTIONS = Object.keys(LABELS).map((l) => ({ value: l, label: LABELS[
 // The record being reviewed and the author's unsaved choices
 let rec = null
 let draft = null
+let cur = 0 // index of the claim last focused, for stepping with j/k and the arrows
+
+// Moves the focus ring to the claim `delta` away from the current one; never touches labels
+async function step($, delta) {
+  if (!rec) return
+  const n = rec.parsed.human.length
+  cur = Math.max(0, Math.min(n - 1, cur + delta))
+  await $.ui.focus({ requestId: PANE, key: 'h-' + rec.parsed.human[cur].id })
+}
 
 function startDraft(path, source) {
   const parsed = parseRecord(source)
   rec = { path, source, parsed }
+  cur = 0
   draft = { human: {}, ai: {}, accuracy: parsed.accuracy ? parsed.accuracy.checked : false, bulk: false, armed: false, error: null }
   for (const c of parsed.human) draft.human[c.id] = { checked: c.checked, label: c.label, evidence: '' }
   for (const c of parsed.ai) draft.ai[c.id] = { checked: c.checked }
@@ -122,9 +132,26 @@ export function register(on) {
     return {}
   })
 
+  // Keep the claim index in step with wherever the ring lands (Tab, click, j/k, arrows)
+  on('ui.focus', { requestId: PANE }, async ($, e, next) => {
+    const i = rec && e.element && e.element.startsWith('h-') ? rec.parsed.human.findIndex((c) => 'h-' + c.id === e.element) : -1
+    if (i >= 0) cur = i
+    return next(e)
+  })
+
+  // The arrows arrive through the Client in the pane
+  on('ui.message', { requestId: PANE }, async ($, e, next) => {
+    const d = e.data
+    if (e.element === 'nav' && d && typeof d.step === 'number') {
+      await step($, d.step)
+      return {}
+    }
+    return next(e)
+  })
+
   on('ui.render', { component: 'Pane' }, async ($, e, next) => {
     if (e.requestId !== PANE) return next(e)
-    const { Box, Text, Button, Select, Input } = $.ui.resolve(e)
+    const { Box, Text, Button, Select, Input, Client } = $.ui.resolve(e)
     if (!rec) {
       const pending = (list || []).filter((x) => x.approval === 'pending').length
       return Box({
@@ -159,6 +186,7 @@ export function register(on) {
     if (r.summary) rows.push(Text({ wrap: 'wrap', children: [r.summary] }))
     rows.push(Text({ children: [' '] }))
     rows.push(Text({ bold: true, children: ['What ' + r.frontmatter.member + ' did  (★ key)'] }))
+    rows.push(Client({ key: 'nav', module: './nav.js', height: 1 }))
 
     r.human.forEach((c, i) => {
       const d = draft.human[c.id]
@@ -262,6 +290,8 @@ export function register(on) {
               redraw()
             },
           }),
+          Button({ key: 'next', label: 'Next claim', hotkey: 'j', plain: true, onPress: () => step($, 1) }),
+          Button({ key: 'prev', label: 'Prev claim', hotkey: 'k', plain: true, onPress: () => step($, -1) }),
           Button({
             key: 'labels',
             label: draft.editLabels ? 'Done with labels' : 'Edit labels',
