@@ -5,9 +5,18 @@ description: Draft a Claudoperation session record of what the human contributed
 
 # Capture a session record
 
-You draft a session record in the format defined in `SPEC.md`, in this skill's folder. The human only approves, relabels and reorders. **Never ask the author questions while drafting.** If something is unclear, record it under Open questions.
+You draft a session record in the format defined in `SPEC.md`, in this skill's folder. The human only approves, relabels and reorders. **Never ask the author questions while drafting** (the one exception is the capture destination, step 0, asked once before drafting starts). If something is unclear, record it under Open questions.
 
 Gold examples: `examples/*.md` in this skill's folder. Read `SPEC.md` and one example before drafting.
+
+## 0. Capture destination
+
+Records go to `<capture_dir>/<member>/<session-id>.md`. Read `capture_dir` from `.claudoperation/policy.yml` at the repo root.
+
+- **Set:** use it. Do not ask.
+- **Not set (first capture, or no policy file):** before drafting, ask the author once where records should be saved, offering `sessions` (the default, relative to the repo root) as the suggested answer. Save the answer as `capture_dir: <path>` in `.claudoperation/policy.yml`, creating the file if needed and keeping any other keys, and tell the author you did. Later captures reuse it silently. The author changes it by editing that line.
+- Use a path inside the repo, relative to the repo root. If the author gives an absolute path or one outside the repo, say so and ask for another.
+- Anywhere below, `sessions/` means this `capture_dir`.
 
 ## 1. Scope
 
@@ -74,7 +83,7 @@ Mark the top 3 human claims as key, each with a *Why key* phrase of under 15 wor
 Run the validator from this skill's folder and fix every error it reports:
 
 ```bash
-node <skill-folder>/scripts/validate.mjs sessions/<member>/<session-id>.md
+node <skill-folder>/scripts/validate.mjs <capture_dir>/<member>/<session-id>.md
 ```
 
 If `node` is not available, check by hand:
@@ -91,7 +100,7 @@ If `node` is not available, check by hand:
 
 ## 7. Hand over for approval
 
-- Write the file to `sessions/<member>/<session-id>.md`.
+- Write the file to `<capture_dir>/<member>/<session-id>.md`.
 - Show the author the summary, the key claims, and counts: human claims, minor details, AI claims, never discussed, delegated.
 - **Session volume, Claude Code only** (SPEC.md section 10). Claude Code keeps a transcript of the session with timestamps and marks which turns a person typed. Locate it with `node <skill-folder>/scripts/session-stats.mjs --find`, then **ask the author for permission to read that file, naming its path**. Only on a yes, run `node <skill-folder>/scripts/session-stats.mjs <path> --section` and put its output in the record as the `## Session volume` section, just above Record details; show the three figures in your hand-over too. Active time counts only gaps of up to 15 minutes between messages (longer gaps are breaks); say so if the author asks. Pasted text is not counted. On a no, or with no `node`, no transcript, or on claude.ai or any other client, leave the section out without comment. Never estimate the numbers yourself, and never rank or credit anyone by them.
 - Approval by product type: `functional` → the author replies "ok" or lists corrections (`by-exception`); `endorsed` → the author ticks claims and endorsements in the file, the PR, or with `/claudoperation-approve`, the approval pane in Claude Code (`individual`).

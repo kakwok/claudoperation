@@ -28,14 +28,20 @@ function startDraft(path, source) {
   for (const c of parsed.ai) draft.ai[c.id] = { checked: c.checked }
 }
 
-// Every record under sessions/<member>/, newest first, with its approval state
+// Every record under <capture_dir>/<member>/, newest first, with its approval state
 let list = null
 async function loadList($) {
   const found = []
-  // Claude Code may be started below the repo root: look for sessions/ in the working directory, then up to three levels above
+  // Claude Code may be started below the repo root: look for the capture directory in the working directory, then up to three levels above
+  // The directory is the capture_dir key in .claudoperation/policy.yml, 'sessions' when unset
   let root = null
   for (const up of ['', '../', '../../', '../../../']) {
-    if (await $.fs.exists(up + 'sessions')) { root = up + 'sessions'; break }
+    let dir = 'sessions'
+    if (await $.fs.exists(up + '.claudoperation/policy.yml')) {
+      const m = (await $.fs.read(up + '.claudoperation/policy.yml')).match(/^capture_dir:\s*["']?([^"'#\n]+?)["']?\s*(#.*)?$/m)
+      if (m) dir = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
+    }
+    if (await $.fs.exists(up + dir)) { root = up + dir; break }
   }
   if (root) {
     for (const member of await $.fs.list(root)) {
@@ -131,7 +137,7 @@ export function register(on) {
       if (err) return { text: err }
     } else {
       await loadList($)
-      if (!list.length) return { text: 'No records under sessions/. Pass a path: /claudoperation-approve <record.md>' }
+      if (!list.length) return { text: 'No records found in the capture directory. Pass a path: /claudoperation-approve <record.md>' }
     }
     await $.ui.open({ id: PANE, title: 'Approve record', focus: true, closeOnEscape: true })
     return {}

@@ -6,7 +6,7 @@ Worked examples: `examples/` in this folder. Validate a record with `node script
 
 ## 1. File
 
-- Path: `sessions/<member>/<YYYY-MM-DD>-<slug>.md`
+- Path: `<capture_dir>/<member>/<YYYY-MM-DD>-<slug>.md`. `capture_dir` is the `capture_dir` key in `.claudoperation/policy.yml`, `sessions` when unset. The first capture asks the author and writes it there.
 - The session ID is the filename stem, e.g. `2026-11-03-policy-format`.
 - Records are append-only. A later change is a new claim in a later session that points back with a relation (section 5). Never renumber or rewrite an approved claim.
 - No YAML frontmatter. GitHub draws frontmatter as a table at the top of the page, so metadata lives in the Record details block (section 2).

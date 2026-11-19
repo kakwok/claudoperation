@@ -5,14 +5,14 @@ description: Write a member's net story (A to C) from their approved Claudoperat
 
 # Synthesize a net story
 
-You turn one member's session records (`sessions/<member>/*.md`, format in `../capture/SPEC.md`) into a **net story**: what changed from the first record to the latest, so a reader can skip the steps in between. You only restate approved claims. **Never ask the author questions while drafting**; unclear items go under Open questions.
+You turn one member's session records (`<capture_dir>/<member>/*.md`, where `capture_dir` is the key in `.claudoperation/policy.yml`, `sessions` when unset; format in `../capture/SPEC.md`) into a **net story**: what changed from the first record to the latest, so a reader can skip the steps in between. You only restate approved claims. **Never ask the author questions while drafting**; unclear items go under Open questions.
 
 Read `../capture/SPEC.md` first. Narrative belongs here, not in session records.
 
 ## 1. Scope
 
 - Member: the user's handle, or the folder named in the request.
-- Records: everything in `sessions/<member>/` after the last release (`releases/<member>/*.md` newest `covers_to`). With no release yet, all records.
+- Records: everything in `<capture_dir>/<member>/` after the last release (`releases/<member>/*.md` newest `covers_to`). With no release yet, all records.
 - Only **ticked** claims enter the story. A `pending` record contributes nothing; list it as an Open question ("N records not yet approved").
 - With fewer than 2 approved records, say a net story adds little and stop unless the author insists.
 
@@ -21,7 +21,7 @@ Read `../capture/SPEC.md` first. Narrative belongs here, not in session records.
 Do not count by hand. Run:
 
 ```bash
-node <skill-folder>/scripts/stats.mjs sessions/<member>
+node <skill-folder>/scripts/stats.mjs <capture_dir>/<member>
 ```
 
 If `node` is unavailable, count from the records and say the counts were manual.
@@ -37,7 +37,7 @@ If `node` is unavailable, count from the records and say the counts were manual.
 
 ## 4. Write the file
 
-Path: `sessions/<member>/net/<YYYY-MM-DD>-net.md`. It reads like a short page, not like data: no frontmatter, no IDs or metadata before the story. Same rule as records (`../capture/SPEC.md` §1 to §3).
+Path: `<capture_dir>/<member>/net/<YYYY-MM-DD>-net.md`. It reads like a short page, not like data: no frontmatter, no IDs or metadata before the story. Same rule as records (`../capture/SPEC.md` §1 to §3).
 
 Body, in this order (the reader's order):
 
