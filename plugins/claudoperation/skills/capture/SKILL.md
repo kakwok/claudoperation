@@ -15,7 +15,7 @@ Records go to `<capture_dir>/<member>/<session-id>.md`. Read `capture_dir` from 
 
 - **Set:** use it. Do not ask.
 - **Not set (first capture, or no policy file):** before drafting, ask the author once where records should be saved, offering `sessions` (the default, relative to the repo root) as the suggested answer. Save the answer as `capture_dir: <path>` in `.claudoperation/policy.yml`, creating the file if needed and keeping any other keys, and tell the author you did. Later captures reuse it silently. The author changes it by editing that line.
-- Use a path inside the repo, relative to the repo root. If the author gives an absolute path or one outside the repo, say so and ask for another.
+- Give the path relative to the repo root. It may leave the repo and point into a sibling repository, e.g. `../dev-log/aggregator`. Do not store an absolute path or one starting with `~`: it differs per machine, so say so and ask for a relative one. If the folder does not exist, tell the author and create it only on a yes. When it is in another repo, remind the author that records must be committed there, not in this repo.
 - Anywhere below, `sessions/` means this `capture_dir`.
 
 ## 1. Scope

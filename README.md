@@ -79,7 +79,7 @@ Settings live in `.claudoperation/policy.yml` at the repo root.
 
 | Key | What it does | Default |
 | --- | --- | --- |
-| `capture_dir` | Folder, relative to the repo root, where records and net stories are saved. The first capture asks you and writes it here. | `sessions` |
+| `capture_dir` | Folder, relative to the repo root, where records and net stories are saved. It may point into a sibling repo, e.g. `../dev-log/aggregator`; commit the records in that repo. The first capture asks you and writes it here. | `sessions` |
 
 Capture also reads each path's product type from this file; see `skills/capture/SKILL.md`.
 

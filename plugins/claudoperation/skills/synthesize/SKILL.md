@@ -69,7 +69,7 @@ Contents, at most about five lines:
 
 - Session count and label counts (approved claims)
 - Human:AI claim ratio, with the words "informational, not a target"
-- Latest net story: 1 to 2 sentences and a link, marked unapproved unless released
+- Latest net story: 1 to 2 sentences and a link, marked unapproved unless released. If `capture_dir` is outside this repo, the link goes to a sibling repo: write the relative path anyway and say in the story line that it lives in the other repo
 - Unreviewed AI decisions count, bulk approvals, relabels, overrides
 
 Do not touch anything outside the markers.
