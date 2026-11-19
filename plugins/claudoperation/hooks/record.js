@@ -1,5 +1,5 @@
 // Claudoperation session record: parse, validate, and apply approvals.
-// Format: skills/capture/SPEC.md (v0.4). Pure functions, no I/O, so the
+// Format: skills/capture/SPEC.md (v0.5). Pure functions, no I/O, so the
 // approval mod, the validator script, and tests all share one parser.
 // A record reads as a story: title, summary, claim tables. Its metadata sits
 // in a collapsed "Record details" table at the end.
@@ -82,17 +82,18 @@ export function parseRecord(source) {
   const lines = source.split('\n')
   const record = {
     title: null, frontmatter: {}, summary: null, human: [], ai: [], minor: [], minorBoxes: [], accuracy: null,
-    hasKeySection: false, lines,
+    hasKeySection: false, volumeLine: null, volume: null, metaLine: null, lines,
   }
   let inKey = false
   let inMeta = false
   let inMinor = false
+  let inVolume = false
   let inSummary = true
   let summary = []
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]
     if (/^# /.test(line) && record.title === null) { record.title = line.slice(2).trim(); continue }
-    if (line.startsWith('<details><summary>Record details')) { inMeta = true; inKey = false; continue }
+    if (line.startsWith('<details><summary>Record details')) { inMeta = true; inKey = false; inVolume = false; record.metaLine = i; continue }
     if (line.startsWith('<details><summary>Minor details')) { inMinor = true; inKey = false; continue }
     if (inMinor) {
       if (line.startsWith('</details>')) inMinor = false
@@ -117,7 +118,17 @@ export function parseRecord(source) {
       else if (!line.trim() && summary.length) inSummary = false
     }
     if (/^## What .+ did/.test(line)) { inKey = true; record.hasKeySection = true; continue }
-    if (/^## /.test(line) || line.startsWith('<details>')) inKey = false
+    if (/^## /.test(line) || line.startsWith('<details>')) { inKey = false; inVolume = false }
+    if (/^## Session volume/.test(line)) { inVolume = true; record.volumeLine = i; continue }
+    if (inVolume) {
+      // one data row: | active time | human turns | typed words |
+      if (/^\s*\|/.test(line)) {
+        const cells = splitCells(line)
+        const isHeader = /^Active time$/i.test(cells[0]) || cells.every((c) => /^:?-+:?$/.test(c))
+        if (!isHeader) record.volume = { active: cells[0], turns: cells[1], words: cells[2], cells: cells.length }
+      }
+      continue
+    }
 
     let m = line.match(HUMAN_ROW_RE)
     if (m) {
@@ -206,6 +217,17 @@ export function validateRecord(source, { filename } = {}) {
         if (!REF_RE.test(ref)) errors.push(`${c.id}: "${rel.kind}: ${ref}" is not <session-id>#<ID> or #<ID>`)
       }
     }
+  }
+
+  if (r.volumeLine !== null) {
+    const v = r.volume
+    if (!v || v.cells !== 3) errors.push('session volume: needs one row "| Active time | Human turns | Typed words |"')
+    else {
+      if (!/^(?:\d+ h \d{2} m|\d{1,2} m)$/.test(v.active)) errors.push(`session volume: active time "${v.active}" is not like "1 h 05 m" or "45 m"`)
+      if (!/^\d+$/.test(v.turns)) errors.push(`session volume: human turns "${v.turns}" is not a whole number`)
+      if (!/^\d+$/.test(v.words)) errors.push(`session volume: typed words "${v.words}" is not a whole number`)
+    }
+    if (r.metaLine !== null && r.volumeLine > r.metaLine) errors.push('session volume: must come before the Record details block')
   }
 
   if ((r.ai.length || r.minor.length) && !r.accuracy) errors.push('AI decisions: missing the "All AI claims and minor details below are recorded accurately" checkbox')

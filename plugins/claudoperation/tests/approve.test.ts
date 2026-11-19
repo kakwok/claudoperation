@@ -1,5 +1,6 @@
 import { expect, test } from 'claude-code/testing'
 import { validateRecord, applyApproval, parseRecord } from '../hooks/record.js'
+import { transcriptStats, formatVolume, IDLE_MINUTES } from '../hooks/transcript.js'
 
 const RECORD = `# Ana: Detector layout
 
@@ -208,4 +209,64 @@ test('the validator holds the context lines to key claims, in order, without a d
   expect(validateRecord(afterWhy).errors).toContain('H1: "Why key" comes after the Before/Now/Example lines')
   const dup = RECORD.replace('corrects: AI assumed 1 MHz', 'corrects: AI assumed 1 MHz').replace('<br>**Why key:** changes the budget.', '<br>**Before:** 1 MHz.<br>**Why key:** changes the budget.')
   expect(validateRecord(dup).errors).toContain('H2: a "corrects:" line already says what was before; drop "Before:"')
+})
+
+// A transcript: one captured turn, the marker, then a human turn mixing typing and a paste
+const line = (o: object) => JSON.stringify(o)
+const human = (t: string, text: string) => line({ type: 'user', timestamp: t, origin: { kind: 'human' }, promptSource: 'typed', message: { role: 'user', content: text } })
+const TRANSCRIPT = [
+  human('2026-11-18T10:00:00Z', 'before the marker, ignored entirely'),
+  line({ type: 'assistant', timestamp: '2026-11-18T10:01:00Z', message: { content: [{ type: 'text', text: 'Captured.\n[claudoperation:captured 2026-11-18-first]' }] } }),
+  human('2026-11-18T10:10:00Z', 'make the stats simple please'),
+  line({ type: 'assistant', timestamp: '2026-11-18T10:11:00Z', message: { content: [{ type: 'text', text: 'one two three four' }] } }),
+  line({ type: 'user', timestamp: '2026-11-18T10:12:00Z', message: { role: 'user', content: [{ type: 'tool_result', content: 'ignored words here' }] } }),
+  line({ type: 'user', timestamp: '2026-11-18T10:13:00Z', origin: { kind: 'system' }, message: { role: 'user', content: 'task notification not typed by a person' } }),
+  human('2026-11-18T10:20:00Z', 'use this <pasted_content id="1">alpha beta gamma delta epsilon</pasted_content> as a guide'),
+  human('2026-11-18T12:00:00Z', 'back after lunch'),
+  '{"type":"user","times',
+].join('\n')
+
+test('transcript stats count typed words without pasted text, and only human turns after the last marker', async () => {
+  const s = transcriptStats(TRANSCRIPT)
+  expect(s.scopedFromMarker).toBe(true)
+  expect(s.humanTurns).toBe(3)
+  expect(s.typedWords).toBe(5 + 5 + 3) // "make the stats simple please" + "use this  as a guide" + "back after lunch"
+  expect(s.activeMinutes).toBe(1 + 1 + 1 + 7) // 10:10 to 10:20; the 100-minute gap before 12:00 is a break
+  // Whole session, ignoring the marker
+  const all = transcriptStats(TRANSCRIPT, { afterMarker: false })
+  expect(all.scopedFromMarker).toBe(false)
+  expect(all.humanTurns).toBe(4)
+})
+
+test('the volume section reports active time with the 15-minute idle rule, and the validator reads it', async () => {
+  expect(IDLE_MINUTES).toBe(15)
+  const text = formatVolume(transcriptStats(TRANSCRIPT))
+  expect(text).toContain('| 10 m | 3 | 13 |')
+  expect(text).toContain('gaps of up to 15 minutes')
+  expect(formatVolume({ activeMinutes: 65, humanTurns: 24, typedWords: 1340 })).toContain('| 1 h 05 m | 24 | 1340 |')
+  const withVolume = RECORD.replace('<details><summary>Record details</summary>', text + '\n<details><summary>Record details</summary>')
+  expect(validateRecord(withVolume).errors).toEqual([])
+  expect(parseRecord(withVolume).volume).toMatchObject({ active: '10 m', turns: '3', words: '13' })
+  expect(validateRecord(withVolume.replace('| 10 m |', '| about an hour |')).errors.join()).toContain('active time')
+  // After Record details, or without its row, the section is refused
+  const after = RECORD + '\n' + text
+  expect(validateRecord(after).errors).toContain('session volume: must come before the Record details block')
+  expect(validateRecord(RECORD.replace('<details><summary>Record details</summary>', '## Session volume\n\n<details><summary>Record details</summary>')).errors.join()).toContain('session volume: needs one row')
+})
+
+test('the pane finds sessions/ above the working directory', async ($, on) => {
+  // Claude Code started two folders below the repo root: the engine resolves each
+  // candidate to an absolute path, so the stub answers by order (cwd, ../, ../../)
+  let probes = 0
+  on('fs.exists', ($, e) => ({ value: e.path.endsWith('sessions') && ++probes === 3 }))
+  on('fs.list', ($, e) => ({
+    value: e.path.endsWith('/sessions')
+      ? [{ name: 'ana', kind: 'dir', size: 0, isLink: false }]
+      : [{ name: '2026-11-04-demo.md', kind: 'file', size: RECORD.length, isLink: false }],
+  }))
+  on('fs.read', () => ({ value: RECORD }))
+  on('ui.open', () => ({ value: { isPlaced: true } }))
+  expect(await $.command.run({ command: 'claudoperation-approve', args: '' })).toEqual({})
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ key: 'rec-../../sessions/ana/2026-11-04-demo.md' })).toMatchObject({ props: { label: expect.stringContaining('ana') } })
 })

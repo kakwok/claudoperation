@@ -50,11 +50,19 @@ Martin shaped Claudoperation's capture policy, the per-repo rules for how a sess
 - H10, H11, A6 → ranking rule
 </details>
 
+## Session volume
+
+Volume only, not a measure of influence. Active time counts the gaps of up to 15 minutes between messages; a longer gap is a break.
+
+| Active time | Human turns | Typed words |
+| --- | --- | --- |
+| 1 h 05 m | 24 | 1340 |
+
 <details><summary>Record details</summary>
 
 | Field | Value |
 | --- | --- |
-| claudoperation | 0.4 |
+| claudoperation | 0.5 |
 | session | 2026-11-03-policy-format |
 | member | martin |
 | product | claudoperation/docs/design.md |

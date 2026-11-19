@@ -1,4 +1,4 @@
-# Claudoperation session record format — v0.4
+# Claudoperation session record format — v0.5
 
 A session record is a short Markdown file that tells a teammate what a human did in one working session with Claude. It is written by Claude, approved by the human, and kept beside the product. It reads like a short page, not like data: a title, a summary, and claim tables. The metadata sits at the end, collapsed.
 
@@ -17,7 +17,7 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 
 | Field | Required | Values |
 | --- | --- | --- |
-| `claudoperation` | yes | Format version, `0.4` |
+| `claudoperation` | yes | Format version, `0.5` |
 | `session` | yes | The session ID |
 | `member` | yes | Author's handle, same as the folder name |
 | `product` | yes | What the session contributed to: a repo path, document, or PR |
@@ -36,7 +36,8 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 7. **`## Open questions`** — optional; unresolved items, one line each.
 8. **`<details><summary>Links and evidence</summary>`** — optional; pointers into the product.
 9. **`## Endorsements`** — optional; appended later by teammates (section 6).
-10. **`<details><summary>Record details</summary>`** — the metadata (section 2). Always last.
+10. **`## Session volume`** — optional; three plain figures about the session (section 10). Written at hand-over, only with the author's permission to read the session transcript.
+11. **`<details><summary>Record details</summary>`** — the metadata (section 2). Always last.
 
 The title, summary and key table must fit on one screen.
 
@@ -166,7 +167,28 @@ Relabels, promotions or demotions between key and Also, and dropped claims are n
 - No prose narrative in a session record beyond the summary; narrative belongs to `synthesize`.
 - Nothing a reader has to decode comes before the summary: no metadata, IDs or relations above it.
 
+## 10. Session volume
+
+An optional section just above Record details, written by capture in Claude Code (the only client that keeps a transcript with timestamps), and only after the author allows capture to read that transcript. Without permission, without the transcript, or in another client, the section is left out.
+
+```
+## Session volume
+
+Volume only, not a measure of influence. Active time counts the gaps of up to 15 minutes between messages; a longer gap is a break.
+
+| Active time | Human turns | Typed words |
+| --- | --- | --- |
+| 1 h 05 m | 24 | 1340 |
+```
+
+- **Active time** runs from the first human turn after the last capture marker to the last message, and counts the gap between two consecutive messages only when it is **at most 15 minutes**. A longer gap (lunch, overnight, a walk away) is a break and adds nothing, so a session left open for a day still reports the hours actually worked. The 15 is a judgement, not a measured value; it lives as `IDLE_MINUTES` in `hooks/transcript.js`. Written `1 h 05 m`, or `45 m` under an hour.
+- **Human turns** are the messages the person sent, as the transcript marks them; tool results, system notices and hook output are not.
+- **Typed words** are the words in those turns with pasted blocks (`<pasted_content>`) removed. Pasted text is not reported.
+- These are volume figures, not influence: no ratio, no target, never used to rank or credit people. Absent from v0.3 and v0.4 records, which stay valid.
+
 ## Changelog
+
+- **v0.5** — Optional `## Session volume` section (active time, human turns, typed words), written only with the author's permission to read the transcript. Active time ignores gaps over 15 minutes.
 
 - **v0.4** — Outsider-readable records. The summary defines project terms in place (about 70 words); key claims may add `**Before:**`, `**Now:**` and `**Example:**` lines and run to about 50 words; capture's self-check gains an outsider test. No `audience:` policy option: the extra context is always written, since it is bounded to 3 key claims and a switch would invite the shorthand it replaces.
 - **v0.3** — Minor details tier; table-format records.

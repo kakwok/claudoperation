@@ -32,11 +32,16 @@ function startDraft(path, source) {
 let list = null
 async function loadList($) {
   const found = []
-  if (await $.fs.exists('sessions')) {
-    for (const member of await $.fs.list('sessions')) {
+  // Claude Code may be started below the repo root: look for sessions/ in the working directory, then up to three levels above
+  let root = null
+  for (const up of ['', '../', '../../', '../../../']) {
+    if (await $.fs.exists(up + 'sessions')) { root = up + 'sessions'; break }
+  }
+  if (root) {
+    for (const member of await $.fs.list(root)) {
       if (member.kind !== 'dir') continue
-      for (const f of await $.fs.list('sessions/' + member.name)) {
-        if (f.kind === 'file' && f.name.endsWith('.md')) found.push('sessions/' + member.name + '/' + f.name)
+      for (const f of await $.fs.list(root + '/' + member.name)) {
+        if (f.kind === 'file' && f.name.endsWith('.md')) found.push(root + '/' + member.name + '/' + f.name)
       }
     }
   }
@@ -46,7 +51,7 @@ async function loadList($) {
     const p = parseRecord(await $.fs.read(path))
     list.push({
       path,
-      member: path.split('/')[1],
+      member: path.split('/').slice(-2)[0],
       name: path.split('/').pop().replace(/\.md$/, ''),
       approval: p.frontmatter.approval || 'unknown',
       ticked: p.human.filter((c) => c.checked).length,
