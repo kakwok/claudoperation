@@ -1,4 +1,4 @@
-# Claudoperation session record format — v0.5
+# Claudoperation session record format — v0.6
 
 A session record is a short Markdown file that tells a teammate what a human did in one working session with Claude. It is written by Claude, approved by the human, and kept beside the product. It reads like a short page, not like data: a title, a summary, and claim tables. The metadata sits at the end, collapsed.
 
@@ -6,7 +6,8 @@ Worked examples: `examples/` in this folder. Validate a record with `node script
 
 ## 1. File
 
-- Path: `<capture_dir>/<member>/<YYYY-MM-DD>-<slug>.md`. `capture_dir` is the `capture_dir` key in `.claudoperation/policy.yml`, `sessions` when unset. It is relative to the repo root and may point into a sibling repository (`../dev-log/aggregator`). The first capture asks the author and writes it there.
+- Path: `<capture_dir>/<member>/<YYYY-MM-DD>-<slug>.md`. `capture_dir` is the optional `capture_dir` key in the repo's `.claudoperation/policy.yml`, `sessions` when unset. It is relative to the repo root and may point into a sibling repository (`../dev-log/aggregator`). It is a hint: capture proposes it, the author approves the destination at every capture, and capture never writes the key.
+- A session that changed several repos gets one record per repo that has a policy, each at that repo's destination with the same filename. The session keeps one ID sequence, so a record may skip IDs (H1, H3); a claim about several repos appears in each record under the same ID and counts once.
 - The session ID is the filename stem, e.g. `2026-11-03-policy-format`.
 - Records are append-only. A later change is a new claim in a later session that points back with a relation (section 5). Never renumber or rewrite an approved claim.
 - No YAML frontmatter. GitHub draws frontmatter as a table at the top of the page, so metadata lives in the Record details block (section 2).
@@ -17,10 +18,10 @@ The last block of the file, collapsed: `<details><summary>Record details</summar
 
 | Field | Required | Values |
 | --- | --- | --- |
-| `claudoperation` | yes | Format version, `0.5` |
+| `claudoperation` | yes | Format version, `0.6` |
 | `session` | yes | The session ID |
 | `member` | yes | Author's handle, same as the folder name |
-| `product` | yes | What the session contributed to: a repo path, document, or PR |
+| `product` | yes | What the session contributed to: a repo path, document, or PR; for a multi-repo session, also the other repos |
 | `product_type` | yes | `endorsed` or `functional` (section 8) |
 | `span` | yes | `YYYY-MM-DD` or `YYYY-MM-DD → YYYY-MM-DD` |
 | `approval` | yes | `pending`, `individual`, `by-exception`, `bulk` (section 7) |
@@ -187,6 +188,8 @@ Volume only, not a measure of influence. Active time counts the gaps of up to 15
 - These are volume figures, not influence: no ratio, no target, never used to rank or credit people. Absent from v0.3 and v0.4 records, which stay valid.
 
 ## Changelog
+
+- **v0.6** — Multi-repo sessions: one record per changed repo with a policy, one ID sequence across the session (records may skip IDs), `product` names the other repos. `capture_dir` is an optional hint the author approves at every capture; capture no longer writes it.
 
 - **v0.5** — Optional `## Session volume` section (active time, human turns, typed words), written only with the author's permission to read the transcript. Active time ignores gaps over 15 minutes.
 

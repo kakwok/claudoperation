@@ -28,22 +28,45 @@ function startDraft(path, source) {
   for (const c of parsed.ai) draft.ai[c.id] = { checked: c.checked }
 }
 
+// Folds `x/../` and `./` out of a relative path, so `aggregator/../dev-log/aggregator` reads `dev-log/aggregator`
+function normalize(path) {
+  const out = []
+  for (const part of path.split('/')) {
+    if (part === '' || part === '.') continue
+    if (part === '..' && out.length && out[out.length - 1] !== '..') out.pop()
+    else out.push(part)
+  }
+  return out.join('/') || '.'
+}
+
 // Every record under <capture_dir>/<member>/, newest first, with its approval state
 let list = null
 async function loadList($) {
   const found = []
   // Claude Code may be started below the repo root: look for the capture directory in the working directory, then up to three levels above
   // The directory is the capture_dir key in .claudoperation/policy.yml, 'sessions' when unset
-  let root = null
-  for (const up of ['', '../', '../../', '../../../']) {
+  const captureDir = async (base) => {
     let dir = 'sessions'
-    if (await $.fs.exists(up + '.claudoperation/policy.yml')) {
-      const m = (await $.fs.read(up + '.claudoperation/policy.yml')).match(/^capture_dir:\s*["']?([^"'#\n]+?)["']?\s*(#.*)?$/m)
+    if (await $.fs.exists(base + '.claudoperation/policy.yml')) {
+      const m = (await $.fs.read(base + '.claudoperation/policy.yml')).match(/^capture_dir:\s*["']?([^"'#\n]+?)["']?\s*(#.*)?$/m)
       if (m) dir = m[1].replace(/^\.\//, '').replace(/\/+$/, '')
     }
-    if (await $.fs.exists(up + dir)) { root = up + dir; break }
+    return normalize(base + dir)
   }
-  if (root) {
+  const roots = []
+  for (const up of ['', '../', '../../', '../../../']) {
+    const dir = await captureDir(up)
+    if (await $.fs.exists(dir)) { roots.push(dir); break }
+  }
+  // Started in a folder above sibling repos (not itself a repo): collect every child repo's capture directory
+  if (!roots.length) {
+    for (const child of await $.fs.list('.')) {
+      if (child.kind !== 'dir' || !(await $.fs.exists(child.name + '/.claudoperation/policy.yml'))) continue
+      const dir = await captureDir(child.name + '/')
+      if (!roots.includes(dir) && (await $.fs.exists(dir))) roots.push(dir)
+    }
+  }
+  for (const root of roots) {
     for (const member of await $.fs.list(root)) {
       if (member.kind !== 'dir') continue
       for (const f of await $.fs.list(root + '/' + member.name)) {

@@ -5,13 +5,15 @@ description: Write a member's net story (A to C) from their approved Claudoperat
 
 # Synthesize a net story
 
-You turn one member's session records (`<capture_dir>/<member>/*.md`, where `capture_dir` is the key in `.claudoperation/policy.yml`, `sessions` when unset; format in `../capture/SPEC.md`) into a **net story**: what changed from the first record to the latest, so a reader can skip the steps in between. You only restate approved claims. **Never ask the author questions while drafting**; unclear items go under Open questions.
+You turn one member's session records (`<capture_dir>/<member>/*.md`, where `capture_dir` is the key in `.claudoperation/policy.yml`, `sessions` when unset; format in `../capture/SPEC.md`) into a **net story**: what changed from the first record to the latest, so a reader can skip the steps in between. You only restate approved claims. **Never ask the author questions while drafting** (the one exception is choosing slots, step 1); unclear items go under Open questions.
 
 Read `../capture/SPEC.md` first. Narrative belongs here, not in session records.
 
 ## 1. Scope
 
 - Member: the user's handle, or the folder named in the request.
+- Slot: one `<capture_dir>/<member>/` folder; each slot gets its own net story. Started inside a repo, the slot is that repo's `capture_dir` (as in capture). Started in a folder that is not a repo, read `capture_dir` from each child repo's `.claudoperation/policy.yml`, list the slots holding records by this member, and ask the author once which to write (suggest those with records newer than their last net story). Do each step below per slot.
+- A claim of a multi-repo session appears in several slots under the same `<session-id>#<ID>` (`../capture/SPEC.md` §1): it counts as approved if ticked in any copy, so for a claim unticked here, look at the same session's record in the other slots.
 - Records: everything in `<capture_dir>/<member>/` after the last release (`releases/<member>/*.md` newest `covers_to`). With no release yet, all records.
 - Only **ticked** claims enter the story. A `pending` record contributes nothing; list it as an Open question ("N records not yet approved").
 - With fewer than 2 approved records, say a net story adds little and stop unless the author insists.
@@ -57,7 +59,7 @@ When the author approves the story, set `release` to `true`, `approval` to `indi
 
 ## 6. Update the README section
 
-Rewrite only the text between these markers in the repo `README.md`, creating the block once if missing:
+Rewrite only the text between these markers in the `README.md` of the repo that holds the net story, creating the block once if missing (with several slots in one repo, one block per slot, `<member>` replaced by `<slot>:<member>`, e.g. `aggregator:martin`):
 
 ```
 <!-- claudoperation:<member>:start -->

@@ -270,3 +270,25 @@ test('the pane finds sessions/ above the working directory', async ($, on) => {
   const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
   expect(await ui.find({ key: 'rec-../../sessions/ana/2026-11-04-demo.md' })).toMatchObject({ props: { label: expect.stringContaining('ana') } })
 })
+
+test('the pane collects each child repo capture_dir when started above sibling repos', async ($, on) => {
+  // operations-orchestra/ (not a repo) holds aggregator/ and utils/, each with a policy
+  // pointing into ../dev-log/<repo>; nothing is found walking up from the working directory
+  const policy = (repo) => `capture_dir: ../dev-log/${repo}  # records live in dev-log\n`
+  const dir = (name) => ({ name, kind: 'dir', size: 0, isLink: false })
+  const file = (name) => ({ name, kind: 'file', size: RECORD.length, isLink: false })
+  on('fs.exists', ($, e) => ({ value: /(aggregator|utils)\/\.claudoperation\/policy\.yml$|dev-log\/(aggregator|utils)$/.test(e.path) }))
+  on('fs.read', ($, e) => ({ value: e.path.endsWith('policy.yml') ? policy(e.path.match(/(aggregator|utils)\/\.claudoperation/)[1]) : RECORD }))
+  on('fs.list', ($, e) => ({
+    value: /dev-log\/(aggregator|utils)$/.test(e.path) ? [dir('ana')]
+      : /dev-log\/aggregator\/ana$/.test(e.path) ? [file('2026-11-20-store.md')]
+      : /dev-log\/utils\/ana$/.test(e.path) ? [file('2026-11-20-store.md'), file('2026-11-19-time.md')]
+      : [dir('aggregator'), dir('utils'), dir('dev-log'), file('notes.txt')],
+  }))
+  on('ui.open', () => ({ value: { isPlaced: true } }))
+  expect(await $.command.run({ command: 'claudoperation-approve', args: '' })).toEqual({})
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ key: 'rec-dev-log/aggregator/ana/2026-11-20-store.md' })).toBeDefined()
+  expect(await ui.find({ key: 'rec-dev-log/utils/ana/2026-11-20-store.md' })).toBeDefined()
+  expect(await ui.find({ key: 'rec-dev-log/utils/ana/2026-11-19-time.md' })).toBeDefined()
+})

@@ -5,24 +5,25 @@ description: Draft a Claudoperation session record of what the human contributed
 
 # Capture a session record
 
-You draft a session record in the format defined in `SPEC.md`, in this skill's folder. The human only approves, relabels and reorders. **Never ask the author questions while drafting** (the one exception is the capture destination, step 0, asked once before drafting starts). If something is unclear, record it under Open questions.
+You draft a session record in the format defined in `SPEC.md`, in this skill's folder. The human only approves, relabels and reorders. **Never ask the author questions while drafting** (the one exception is approving the destination, step 0, asked once before drafting starts). If something is unclear, record it under Open questions.
 
 Gold examples: `examples/*.md` in this skill's folder. Read `SPEC.md` and one example before drafting.
 
 ## 0. Capture destination
 
-Records go to `<capture_dir>/<member>/<session-id>.md`. Read `capture_dir` from `.claudoperation/policy.yml` at the repo root.
+Infer, approve, go. The session may have started inside one repo or in a folder above several sibling repos; the rule is the same.
 
-- **Set:** use it. Do not ask.
-- **Not set (first capture, or no policy file):** before drafting, ask the author once where records should be saved, offering `sessions` (the default, relative to the repo root) as the suggested answer. Save the answer as `capture_dir: <path>` in `.claudoperation/policy.yml`, creating the file if needed and keeping any other keys, and tell the author you did. Later captures reuse it silently. The author changes it by editing that line.
-- Give the path relative to the repo root. It may leave the repo and point into a sibling repository, e.g. `../dev-log/aggregator`. Do not store an absolute path or one starting with `~`: it differs per machine, so say so and ask for a relative one. If the folder does not exist, tell the author and create it only on a yes. When it is in another repo, remind the author that records must be committed there, not in this repo.
-- Anywhere below, `sessions/` means this `capture_dir`.
+1. **Infer.** List the git repos whose files the session changed. Ignore files matching that repo's policy `exempt` list and session records. Each repo with a `.claudoperation/policy.yml` at its root gets one record at `<capture_dir>/<member>/<session-id>.md`, where `capture_dir` is that policy's key, resolved from the repo root (`sessions` when unset). Repos without a policy get no record. With no repo to propose (nothing changed, or no policy anywhere), propose `sessions` in the start folder's repo; if the start folder is not in a repo, ask the author for a path instead.
+2. **Approve.** Before drafting, always show the destinations on one line and ask once, e.g. `Records → dev-log/aggregator/martin/, dev-log/utils/martin/. OK?` The author may answer ok, drop a destination, or give a path. Use the answer for this capture only; never write it to a policy file, and never create a policy file.
+3. **Go.** Paths stay relative: no absolute path or one starting with `~` (it differs per machine). If a folder does not exist, tell the author and create it only on a yes. When a destination is in another repo, remind the author to commit the record there.
+
+With several records, the session keeps **one ID sequence** (H1, H2, … across the session). Each record holds the claims about its repo; a claim about several repos appears in each with the same ID. Each record's `product` names the other repos. Anywhere below, `sessions/` means the destination; do each step per record.
 
 ## 1. Scope
 
 - Start after the last marker in this conversation: `[claudoperation:captured <session-id>]`. With no marker, start at the beginning.
 - If you can no longer see back to the marker or the start (earlier context was summarized), say so as an Open question. Do not reconstruct from memory.
-- Product and product type: read `.claudoperation/policy.yml` for the path the session touched. With no policy file, use `product_type: endorsed`.
+- Product and product type: read each record's repo policy for the paths the session changed in that repo. With no policy file, use `product_type: endorsed`.
 
 ## 2. Find the claims
 
@@ -100,10 +101,10 @@ If `node` is not available, check by hand:
 
 ## 7. Hand over for approval
 
-- Write the file to `<capture_dir>/<member>/<session-id>.md`.
+- Write each file to its approved destination, `<capture_dir>/<member>/<session-id>.md`.
 - Show the author the summary, the key claims, and counts: human claims, minor details, AI claims, never discussed, delegated.
 - **Session volume, Claude Code only** (SPEC.md section 10). Claude Code keeps a transcript of the session with timestamps and marks which turns a person typed. Locate it with `node <skill-folder>/scripts/session-stats.mjs --find`, then **ask the author for permission to read that file, naming its path**. Only on a yes, run `node <skill-folder>/scripts/session-stats.mjs <path> --section` and put its output in the record as the `## Session volume` section, just above Record details; show the three figures in your hand-over too. Active time counts only gaps of up to 15 minutes between messages (longer gaps are breaks); say so if the author asks. Pasted text is not counted. On a no, or with no `node`, no transcript, or on claude.ai or any other client, leave the section out without comment. Never estimate the numbers yourself, and never rank or credit anyone by them.
 - Approval by product type: `functional` → the author replies "ok" or lists corrections (`by-exception`); `endorsed` → the author ticks claims and endorsements in the file, the PR, or with `/claudoperation-approve`, the approval pane in Claude Code (`individual`).
-- **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/claudoperation-approve`, which lists the session records in the approval pane (the author picks the new one). Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
+- **Only in Claude Code, and only for `endorsed` records:** end by asking the author to run `/claudoperation-approve`, which lists the session records in the approval pane (the author picks each new one). Claude Code is the only place the pane exists: on claude.ai or any other client, do not mention it and use the file or "ok" route instead. You cannot open the pane yourself, so make the request the last thing before the marker.
 - Apply the author's corrections exactly, note them in Links and evidence as `author: <change>`, and set `approval`.
 - End your reply with the marker on its own line: `[claudoperation:captured <session-id>]`

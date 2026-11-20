@@ -31,7 +31,7 @@ Only claims a teammate needs to read get an approve box. Small edits (wording, n
 | Part | What it does | Where it runs |
 | --- | --- | --- |
 | `/claudoperation:capture` | Drafts a record of the session since the last capture, ranks your key contributions, runs the validator, and (with your permission) adds session volume: active time, turns and typed words | Claude Code; skills also load on claude.ai |
-| `SPEC.md` | The record format, v0.5 | Inside the skill folder |
+| `SPEC.md` | The record format, v0.6 | Inside the skill folder |
 | `scripts/validate.mjs` | Checks a record against the spec (needs Node.js) | Anywhere |
 | `/claudoperation:synthesize` | Writes your net story (what changed from your first record to your latest) and refreshes the Team block below | Claude Code; skills also load on claude.ai |
 | `/claudoperation-approve` | A pane to tick claims, change labels, add evidence, and endorse AI decisions, then save | Claude Code terminal, Desktop app, VS Code (v2.1.287+) |
@@ -58,7 +58,7 @@ The skills work in the Claude app; the approval pane does not, because it only e
 3. Install the `claudoperation` plugin from that marketplace.
 4. In a chat, ask Claude to capture the session, or run `/claudoperation:capture`.
 5. Approve by replying "ok" with any corrections, or by ticking the checkboxes in the file.
-6. Download the record and add it to your repo at `<capture_dir>/<you>/` (`sessions/<you>/` unless you chose another folder).
+6. Download the record and add it to your repo at `<capture_dir>/<you>/` (`sessions/<you>/` unless your policy names another folder).
 
 <p align="center">
   <img src="docs/claude-app.png" width="560" alt="The Claude app's Customize page, Plugins tab, with the Add marketplace dialog open. Add from a repository is the second option.">
@@ -67,7 +67,7 @@ The skills work in the Claude app; the approval pane does not, because it only e
 ## Use
 
 1. Work with Claude as usual.
-2. Run `/claudoperation:capture`. The first time, Claude asks where to save records and stores your answer as `capture_dir` in `.claudoperation/policy.yml` (default `sessions`). Then it writes `<capture_dir>/<you>/<date>-<slug>.md`.
+2. Run `/claudoperation:capture`. Claude proposes where the record goes (`<capture_dir>/<you>/<date>-<slug>.md`, one per repo the session changed) and asks you to OK it in one line. Then it drafts and writes the record.
 3. Run `/claudoperation-approve` (it lists your records, pending first; pick one, or pass a path to open it directly), tick what's right, fix labels, save.
 4. Commit the record with your product changes.
 
@@ -75,13 +75,15 @@ Without the pane, edit the checkboxes in the file directly, or reply "ok" with a
 
 ## Configuration
 
-Settings live in `.claudoperation/policy.yml` at the repo root.
+Settings live in `.claudoperation/policy.yml` at each repo's root.
 
 | Key | What it does | Default |
 | --- | --- | --- |
-| `capture_dir` | Folder, relative to the repo root, where records and net stories are saved. It may point into a sibling repo, e.g. `../dev-log/aggregator`; commit the records in that repo. The first capture asks you and writes it here. | `sessions` |
+| `capture_dir` | Folder, relative to the repo root, that capture proposes for this repo's records and net stories. It may point into a sibling repo, e.g. `../dev-log/aggregator`; commit the records in that repo. You approve the destination at every capture; capture never writes this key. | `sessions` |
 
 Capture also reads each path's product type from this file; see `skills/capture/SKILL.md`.
+
+**Several sibling repos.** You may start Claude in a folder above sibling repos that is not itself a repo (e.g. `aggregator/`, `utils/` and `dev-log/` side by side). Capture then writes one record per changed repo, at that repo's `capture_dir`, and the approval pane lists records from every child repo's `capture_dir`. No policy is needed in the parent folder.
 
 ## Team
 

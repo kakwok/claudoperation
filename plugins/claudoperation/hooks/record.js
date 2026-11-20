@@ -1,5 +1,5 @@
 // Claudoperation session record: parse, validate, and apply approvals.
-// Format: skills/capture/SPEC.md (v0.5). Pure functions, no I/O, so the
+// Format: skills/capture/SPEC.md (v0.6). Pure functions, no I/O, so the
 // approval mod, the validator script, and tests all share one parser.
 // A record reads as a story: title, summary, claim tables. Its metadata sits
 // in a collapsed "Record details" table at the end.
